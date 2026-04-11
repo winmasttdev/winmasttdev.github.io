@@ -9,22 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        :root {
-            --accent: #ffffff;
-            --dim: #888;
-            --subtle: #333;
-            --card-bg: rgba(10,10,10,0.9);
-            --border: rgba(255,255,255,0.08);
-        }
-
-        /* Custom minimal scrollbar */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        :root { --accent: #ffffff; --dim: #888; --subtle: #333; --card-bg: rgba(10,10,10,0.9); --border: rgba(255,255,255,0.08); }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 10px; }
@@ -40,402 +26,82 @@
         }
 
         .noise {
-            position: fixed;
-            inset: 0;
+            position: fixed; inset: 0;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.5;
+            pointer-events: none; z-index: 0; opacity: 0.5;
         }
 
         .glow {
-            position: fixed;
-            width: 800px;
-            height: 800px;
+            position: fixed; width: 800px; height: 800px;
             background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 60%);
-            top: -200px; /* Default position before JS kicks in */
-            left: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            z-index: 0;
+            top: -200px; left: 50%; transform: translate(-50%, -50%);
+            pointer-events: none; z-index: 0;
             transition: top 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), left 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        .container {
-            position: relative;
-            z-index: 1;
-            max-width: 680px;
-            margin: 0 auto;
-            padding: 0 1.5rem 5rem;
-        }
+        .container { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; padding: 0 1.5rem 5rem; }
 
-        nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 2rem 0 3rem;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 3.5rem;
-        }
-
-        .nav-logo {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            color: #555;
-            text-decoration: none;
-            text-transform: lowercase;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: color 0.3s;
-        }
-
-        .nav-logo:hover { color: #fff; }
-
-        .nav-back {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            color: #555;
-            text-decoration: none;
-            text-transform: lowercase;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: color 0.3s;
-        }
-
-        .nav-back:hover { color: #fff; }
+        nav { display: flex; align-items: center; justify-content: space-between; padding: 2rem 0 3rem; border-bottom: 1px solid var(--border); margin-bottom: 3.5rem; }
+        
+        .nav-logo, .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #555; text-decoration: none; text-transform: lowercase; display: flex; align-items: center; gap: 8px; transition: color 0.3s; }
+        .nav-logo:hover, .nav-back:hover { color: #fff; }
 
         .hero { margin-bottom: 4rem; }
+        .hero-badge { display: inline-flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #777; text-transform: uppercase; letter-spacing: 2px; border: 1px solid var(--border); padding: 6px 14px; border-radius: 50px; margin-bottom: 1.5rem; background: rgba(255,255,255,0.02); }
+        .hero-badge span { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 8px rgba(34, 197, 94, 0.6); animation: blink-dot 2s ease-in-out infinite; }
+        
+        @keyframes blink-dot { 0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(34, 197, 94, 0.6); } 50% { opacity: 0.4; box-shadow: 0 0 2px rgba(34, 197, 94, 0.2); } }
 
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            color: #777;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            border: 1px solid var(--border);
-            padding: 6px 14px;
-            border-radius: 50px;
-            margin-bottom: 1.5rem;
-            background: rgba(255,255,255,0.02);
-        }
-
-        .hero-badge span {
-            width: 6px;
-            height: 6px;
-            background: #22c55e;
-            border-radius: 50%;
-            box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
-            animation: blink-dot 2s ease-in-out infinite;
-        }
-
-        @keyframes blink-dot {
-            0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(34, 197, 94, 0.6); }
-            50% { opacity: 0.4; box-shadow: 0 0 2px rgba(34, 197, 94, 0.2); }
-        }
-
-        .hero h1 {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: clamp(2.2rem, 7vw, 3.5rem);
-            font-weight: 700;
-            letter-spacing: -2px;
-            line-height: 1.1;
-            color: #fff;
-            text-transform: lowercase;
-            margin-bottom: 1.2rem;
-        }
-
+        .hero h1 { font-family: 'JetBrains Mono', monospace; font-size: clamp(2.2rem, 7vw, 3.5rem); font-weight: 700; letter-spacing: -2px; line-height: 1.1; color: #fff; text-transform: lowercase; margin-bottom: 1.2rem; }
         .hero h1 span { color: #444; }
+        .hero-desc { font-size: 1rem; line-height: 1.7; color: #777; max-width: 480px; margin-bottom: 2rem; }
+        .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
-        .hero-desc {
-            font-size: 1rem;
-            line-height: 1.7;
-            color: #777;
-            max-width: 480px;
-            margin-bottom: 2rem;
-        }
-
-        .hero-actions {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            font-family: 'JetBrains Mono', monospace;
-            text-transform: lowercase;
-            font-size: 0.85rem;
-            font-weight: 700;
-            padding: 12px 24px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            border: none;
-        }
-
-        .btn-white {
-            background: #fff;
-            color: #000;
-            box-shadow: 0 4px 15px rgba(255,255,255,0.08);
-        }
-
-        .btn-white:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255,255,255,0.2);
-            background: #f0f0f0;
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: #777;
-            border: 1px solid rgba(255,255,255,0.15);
-        }
-
-        .btn-outline:hover {
-            color: #fff;
-            border-color: rgba(255,255,255,0.3);
-            background: rgba(255,255,255,0.05);
-        }
+        .btn { font-family: 'JetBrains Mono', monospace; text-transform: lowercase; font-size: 0.85rem; font-weight: 700; padding: 12px 24px; border-radius: 10px; cursor: pointer; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; border: none; }
+        .btn-white { background: #fff; color: #000; box-shadow: 0 4px 15px rgba(255,255,255,0.08); }
+        .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,255,255,0.2); background: #f0f0f0; }
+        .btn-outline { background: transparent; color: #777; border: 1px solid rgba(255,255,255,0.15); }
+        .btn-outline:hover { color: #fff; border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.05); }
 
         .section { margin-bottom: 3.5rem; }
-
-        .section-label {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.65rem;
-            color: #555;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-bottom: 1.2rem;
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px;
-        }
-
-        .feature {
-            background: rgba(15, 15, 15, 0.6);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 1.4rem;
-            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-
-        .feature:hover {
-            border-color: rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.04);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .feature-icon {
-            font-size: 18px;
-            margin-bottom: 12px;
-            color: #666;
-            transition: color 0.3s;
-        }
-
+        .section-label { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: #555; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 1.2rem; }
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+        .feature { background: rgba(15, 15, 15, 0.6); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 16px; padding: 1.4rem; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .feature:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .feature-icon { font-size: 18px; margin-bottom: 12px; color: #666; transition: color 0.3s; }
         .feature:hover .feature-icon { color: #fff; }
+        .feature-title { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 700; color: #eee; text-transform: lowercase; margin-bottom: 6px; }
+        .feature-desc { font-size: 0.78rem; color: #666; line-height: 1.6; }
 
-        .feature-title {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #eee;
-            text-transform: lowercase;
-            margin-bottom: 6px;
-        }
-
-        .feature-desc {
-            font-size: 0.78rem;
-            color: #666;
-            line-height: 1.6;
-        }
-
-        .code-block {
-            background: rgba(15, 15, 15, 0.6);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            overflow: hidden;
-            transition: border-color 0.3s;
-        }
-        
+        .code-block { background: rgba(15, 15, 15, 0.6); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: border-color 0.3s; }
         .code-block:hover { border-color: rgba(255,255,255,0.15); }
+        .code-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02); }
+        .code-title { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #666; text-transform: lowercase; }
+        .code-copy { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #666; background: none; border: 1px solid transparent; cursor: pointer; padding: 4px 10px; border-radius: 6px; transition: all 0.2s; }
+        .code-copy:hover { color: #fff; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.1); }
+        pre { padding: 1.2rem 1.4rem; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.7; color: #888; }
+        pre .c { color: #555; } pre .s { color: #fff; } pre .k { color: #ccc; }
 
-        .code-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 16px;
-            border-bottom: 1px solid var(--border);
-            background: rgba(255,255,255,0.02);
-        }
+        .config-grid { display: flex; flex-direction: column; gap: 8px; }
+        .config-row { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: rgba(15, 15, 15, 0.6); border: 1px solid var(--border); border-radius: 12px; transition: all 0.3s; }
+        .config-row:hover { border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.04); }
+        .config-key { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: #ccc; min-width: 160px; flex-shrink: 0; }
+        .config-val { font-size: 0.78rem; color: #666; line-height: 1.5; }
 
-        .code-title {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.72rem;
-            color: #666;
-            text-transform: lowercase;
-        }
+        .divider { height: 1px; background: var(--border); margin: 3rem 0; }
 
-        .code-copy {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.68rem;
-            color: #666;
-            background: none;
-            border: 1px solid transparent;
-            cursor: pointer;
-            padding: 4px 10px;
-            border-radius: 6px;
-            transition: all 0.2s;
-        }
-
-        .code-copy:hover {
-            color: #fff;
-            background: rgba(255,255,255,0.08);
-            border-color: rgba(255,255,255,0.1);
-        }
-
-        pre {
-            padding: 1.2rem 1.4rem;
-            overflow-x: auto;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            line-height: 1.7;
-            color: #888;
-        }
-
-        pre .c { color: #555; }
-        pre .s { color: #fff; }
-        pre .k { color: #ccc; }
-
-        .config-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .config-row {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 14px 16px;
-            background: rgba(15, 15, 15, 0.6);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            transition: all 0.3s;
-        }
-
-        .config-row:hover {
-            border-color: rgba(255,255,255,0.15);
-            background: rgba(255,255,255,0.04);
-        }
-
-        .config-key {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.78rem;
-            color: #ccc;
-            min-width: 160px;
-            flex-shrink: 0;
-        }
-
-        .config-val {
-            font-size: 0.78rem;
-            color: #666;
-            line-height: 1.5;
-        }
-
-        .divider {
-            height: 1px;
-            background: var(--border);
-            margin: 3rem 0;
-        }
-
-        .footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .footer-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            color: #555;
-            text-transform: lowercase;
-        }
-
-        .footer-avatar {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.1);
-            object-fit: cover;
-            background: #111;
-        }
-
+        .footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+        .footer-brand { display: flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #555; text-transform: lowercase; }
+        .footer-avatar { width: 24px; height: 24px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); object-fit: cover; background: #111; }
         .footer-brand span { color: #888; }
-
-        .footer-links {
-            display: flex;
-            gap: 16px;
-        }
-
-        .footer-links a {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            color: #555;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
+        .footer-links { display: flex; gap: 16px; }
+        .footer-links a { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #555; text-decoration: none; transition: color 0.2s; }
         .footer-links a:hover { color: #fff; }
 
-        #toast {
-            position: fixed;
-            bottom: 40px;
-            left: 50%;
-            transform: translate(-50%, 20px) scale(0.9);
-            background: rgba(255,255,255,0.95);
-            color: #000;
-            padding: 10px 24px;
-            border-radius: 50px;
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: bold;
-            font-size: 0.78rem;
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            pointer-events: none;
-            z-index: 100;
-            text-transform: lowercase;
-            box-shadow: 0 10px 30px rgba(255,255,255,0.15);
-        }
+        #toast { position: fixed; bottom: 40px; left: 50%; transform: translate(-50%, 20px) scale(0.9); background: rgba(255,255,255,0.95); color: #000; padding: 10px 24px; border-radius: 50px; font-family: 'JetBrains Mono', monospace; font-weight: bold; font-size: 0.78rem; opacity: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; z-index: 100; text-transform: lowercase; box-shadow: 0 10px 30px rgba(255,255,255,0.15); }
+        #toast.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
 
-        #toast.show {
-            opacity: 1;
-            transform: translate(-50%, 0) scale(1);
-        }
-
-        @media (max-width: 500px) {
-            .features { grid-template-columns: 1fr 1fr; }
-            .config-row { flex-direction: column; gap: 4px; padding: 12px 14px; }
-            .config-key { min-width: auto; color: #fff; }
-        }
+        @media (max-width: 500px) { .features { grid-template-columns: 1fr 1fr; } .config-row { flex-direction: column; gap: 4px; padding: 12px 14px; } .config-key { min-width: auto; color: #fff; } }
     </style>
 </head>
 <body>
@@ -446,7 +112,8 @@
     <div class="container">
 
         <nav>
-            <a href="../" class="nav-logo">
+            <!-- ЯВНАЯ ССЫЛКА НАЗАД В КОРЕНЬ -->
+            <a href="../index.html" class="nav-logo">
                 <i class="fa-solid fa-arrow-left" style="font-size:11px"></i> return to portfolio
             </a>
             <a href="https://github.com/winmasttdev/NovaHouse" target="_blank" class="nav-back">
@@ -558,7 +225,8 @@
             <div class="footer-links">
                 <a href="https://t.me/winmastt">telegram</a>
                 <a href="https://github.com/winmasttdev/NovaHouse" target="_blank">github</a>
-                <a href="../">portfolio</a>
+                <!-- ЯВНАЯ ССЫЛКА НАЗАД В КОРЕНЬ -->
+                <a href="../index.html">portfolio</a>
             </div>
         </footer>
 
