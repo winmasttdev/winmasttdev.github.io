@@ -23,7 +23,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Custom Scrollbar for small screens */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
@@ -62,7 +61,6 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            /* The variables here are for the JS 3D tilt effect */
             transform: translate(-50%, -50%) rotateX(var(--rx)) rotateY(var(--ry)) scale(0.95);
             background: rgba(15, 15, 15, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -91,15 +89,8 @@
             transform: translate(-50%, -50%) rotateX(var(--rx)) rotateY(var(--ry)) scale(1);
         }
 
-        .card.hidden-left {
-            transform: translate(-120%, -50%) scale(0.85);
-            opacity: 0;
-        }
-
-        .card.hidden-right {
-            transform: translate(20%, -50%) scale(0.85);
-            opacity: 0;
-        }
+        .card.hidden-left { transform: translate(-120%, -50%) scale(0.85); opacity: 0; }
+        .card.hidden-right { transform: translate(20%, -50%) scale(0.85); opacity: 0; }
 
         .avatar-container {
             width: 104px;
@@ -329,7 +320,6 @@
         }
 
         .social-btn i { font-size: 16px; }
-
         .project-card { gap: 16px; }
 
         .social-btn:hover, .project-card:hover {
@@ -363,22 +353,10 @@
             text-transform: lowercase;
         }
 
-        .project-desc {
-            font-size: 0.8rem;
-            color: #777;
-            margin-top: 4px;
-        }
+        .project-desc { font-size: 0.8rem; color: #777; margin-top: 4px; }
 
-        .project-arrow {
-            color: #444;
-            font-size: 14px;
-            transition: 0.3s;
-        }
-
-        .project-card:hover .project-arrow {
-            color: #fff;
-            transform: translateX(4px);
-        }
+        .project-arrow { color: #444; font-size: 14px; transition: 0.3s; }
+        .project-card:hover .project-arrow { color: #fff; transform: translateX(4px); }
 
         #toast {
             position: fixed;
@@ -400,14 +378,10 @@
             box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
         }
 
-        #toast.show {
-            opacity: 1;
-            transform: translate(-50%, 0) scale(1);
-        }
+        #toast.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
 
         @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
 
-        /* Smooth mobile adaptations */
         @media (max-width: 480px) {
             .card { padding: 2rem 1.5rem; }
             h1 { font-size: 1.6rem; }
@@ -424,7 +398,7 @@
         <!-- PROFILE CARD -->
         <div class="card active" id="profile-card">
             <div class="avatar-container">
-                <img src="./avatar.png" alt="winmastt" onerror="this.src='https://ui-avatars.com/api/?name=w&background=111&color=fff'">
+                <img src="avatar.png" alt="winmastt" onerror="this.src='https://ui-avatars.com/api/?name=w&background=111&color=fff'">
                 <div class="status-dot"></div>
             </div>
 
@@ -452,7 +426,8 @@
             <h2>projects</h2>
 
             <div class="projects-grid">
-                <a href="./novahouse/" class="project-card">
+                <!-- ЯВНАЯ ССЫЛКА НА ИНДЕКСНЫЙ ФАЙЛ ПАПКИ -->
+                <a href="novahouse/index.html" class="project-card">
                     <div class="project-icon"><i class="fa-solid fa-house-signal"></i></div>
                     <div class="project-info">
                         <div class="project-name">novahouse</div>
@@ -505,7 +480,6 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // Typewriter effect
             const text = "winmastt";
             const el = document.getElementById("typewriter");
             let i = 0;
@@ -518,7 +492,6 @@
             }
             setTimeout(type, 300);
 
-            // Navigation Logic (Smooth sliding)
             window.navigate = (fromId, toId, direction) => {
                 const from = document.getElementById(fromId);
                 const to = document.getElementById(toId);
@@ -530,7 +503,6 @@
                 to.classList.add('active');
             };
 
-            // Copy to clipboard
             window.copyDiscord = () => {
                 navigator.clipboard.writeText("winmastt").then(() => {
                     const toast = document.getElementById("toast");
@@ -539,26 +511,18 @@
                 });
             };
 
-            // 3D Tilt Effect & Dynamic Background (Desktop only for performance)
             if (window.matchMedia("(pointer: fine)").matches) {
                 document.addEventListener("mousemove", (e) => {
                     const { clientX: x, clientY: y } = e;
                     const { innerWidth: w, innerHeight: h } = window;
-                    
-                    // Tilt calculations
-                    const rx = ((y / h) - 0.5) * -12; // max rotation degrees
+                    const rx = ((y / h) - 0.5) * -12;
                     const ry = ((x / w) - 0.5) * 12;
-                    
-                    // Apply to CSS variables
                     document.documentElement.style.setProperty('--rx', `${rx}deg`);
                     document.documentElement.style.setProperty('--ry', `${ry}deg`);
-                    
-                    // Background glow follow cursor
                     document.documentElement.style.setProperty('--bg-x', `${(x / w) * 100}%`);
                     document.documentElement.style.setProperty('--bg-y', `${(y / h) * 100}%`);
                 });
 
-                // Reset on mouse leave
                 document.addEventListener("mouseleave", () => {
                     document.documentElement.style.setProperty('--rx', `0deg`);
                     document.documentElement.style.setProperty('--ry', `0deg`);
