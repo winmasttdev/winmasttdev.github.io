@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>winmastt</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --rx: 0deg;
+            --ry: 0deg;
+            --bg-x: 50%;
+            --bg-y: 50%;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Custom Scrollbar for small screens */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
+
+        body {
+            background-color: #050505;
+            background-image: radial-gradient(circle at var(--bg-x) var(--bg-y), rgba(255, 255, 255, 0.05) 0%, transparent 40%), 
+                              url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            width: 100vw;
+            height: 100dvh;
+            overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            overscroll-behavior: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+        }
+
+        .scene {
+            position: relative;
+            width: 90%;
+            max-width: 420px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            /* The variables here are for the JS 3D tilt effect */
+            transform: translate(-50%, -50%) rotateX(var(--rx)) rotateY(var(--ry)) scale(0.95);
+            background: rgba(15, 15, 15, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
+            padding: 2.5rem 2rem;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            text-align: center;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            z-index: 0;
+            transition: opacity 0.6s ease, visibility 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            will-change: transform, opacity;
+        }
+
+        .card.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: all;
+            z-index: 10;
+            transform: translate(-50%, -50%) rotateX(var(--rx)) rotateY(var(--ry)) scale(1);
+        }
+
+        .card.hidden-left {
+            transform: translate(-120%, -50%) scale(0.85);
+            opacity: 0;
+        }
+
+        .card.hidden-right {
+            transform: translate(20%, -50%) scale(0.85);
+            opacity: 0;
+        }
+
+        .avatar-container {
+            width: 104px;
+            height: 104px;
+            margin: 0 auto 1.4rem auto;
+            border-radius: 50%;
+            padding: 3px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.02));
+            position: relative;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
+        }
+
+        .avatar-container::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: spin 4s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .avatar-container img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #0a0a0a;
+            display: block;
+            background: #111;
+        }
+
+        .status-dot {
+            width: 14px;
+            height: 14px;
+            background: #22c55e;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            border: 3px solid #0a0a0a;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.8);
+            animation: pulse-dot 2.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+            50% { box-shadow: 0 0 16px rgba(34,197,94,1); }
+        }
+
+        h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 0.4rem;
+            background: linear-gradient(to right, #ffffff, #888888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: lowercase;
+            min-height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h2 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            color: #fff;
+            text-transform: lowercase;
+        }
+
+        .subtitle {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 12px;
+            height: 4px;
+            background-color: #fff;
+            animation: blink 1s step-end infinite;
+            margin-left: 4px;
+            transform: translateY(6px);
+        }
+
+        p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #999;
+            margin-bottom: 1.8rem;
+        }
+
+        .tags {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 6px 14px;
+            border-radius: 8px;
+            color: #aaa;
+            text-transform: lowercase;
+            transition: all 0.3s ease;
+        }
+
+        .tag:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .btn-row {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-primary, .btn-ghost, .btn-back {
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: lowercase;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            padding: 14px 36px;
+            background: #fff;
+            color: #000;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border: none;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+            background: #f0f0f0;
+        }
+
+        .btn-primary:active { transform: translateY(1px); }
+
+        .btn-ghost {
+            padding: 12px 36px;
+            background: transparent;
+            color: #888;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn-ghost:hover {
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-back {
+            padding: 10px 24px;
+            background: transparent;
+            color: #666;
+            font-weight: 400;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255,255,255,0.05);
+            margin-top: 1.5rem;
+        }
+
+        .btn-back:hover {
+            color: #fff;
+            border-color: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .links-container, .projects-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .social-btn, .project-card {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .social-btn {
+            justify-content: center;
+            gap: 12px;
+            color: #aaa;
+            font-weight: 600;
+            font-size: 0.9rem;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: lowercase;
+        }
+
+        .social-btn i { font-size: 16px; }
+
+        .project-card { gap: 16px; }
+
+        .social-btn:hover, .project-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            transform: scale(1.02);
+        }
+
+        .project-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+            color: #fff;
+        }
+
+        .project-info { text-align: left; flex: 1; }
+
+        .project-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #fff;
+            text-transform: lowercase;
+        }
+
+        .project-desc {
+            font-size: 0.8rem;
+            color: #777;
+            margin-top: 4px;
+        }
+
+        .project-arrow {
+            color: #444;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .project-card:hover .project-arrow {
+            color: #fff;
+            transform: translateX(4px);
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translate(-50%, 20px) scale(0.9);
+            background: rgba(255, 255, 255, 0.95);
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: bold;
+            font-size: 0.85rem;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+            z-index: 100;
+            text-transform: lowercase;
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+        }
+
+        #toast.show {
+            opacity: 1;
+            transform: translate(-50%, 0) scale(1);
+        }
+
+        @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+
+        /* Smooth mobile adaptations */
+        @media (max-width: 480px) {
+            .card { padding: 2rem 1.5rem; }
+            h1 { font-size: 1.6rem; }
+            .project-card, .social-btn { padding: 12px; }
+            .btn-primary { padding: 12px 30px; }
+            .btn-ghost { padding: 10px 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scene">
+
+        <!-- PROFILE CARD -->
+        <div class="card active" id="profile-card">
+            <div class="avatar-container">
+                <img src="./avatar.png" alt="winmastt" onerror="this.src='https://ui-avatars.com/api/?name=w&background=111&color=fff'">
+                <div class="status-dot"></div>
+            </div>
+
+            <div class="subtitle">developer</div>
+            <h1><span id="typewriter"></span><span class="cursor"></span></h1>
+
+            <p>windows / linux / android dev learning to build apps & roms.<br>11 yrs old. streamer on twitch, videos on youtube.</p>
+
+            <div class="tags">
+                <span class="tag">#linux</span>
+                <span class="tag">#android</span>
+                <span class="tag">#windows</span>
+                <span class="tag">#dev</span>
+                <span class="tag">#11yo</span>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn-primary" onclick="navigate('profile-card', 'projects-card', 'left')">my projects <i class="fa-solid fa-code"></i></button>
+                <button class="btn-ghost" onclick="navigate('profile-card', 'contact-card', 'right')">socials <i class="fa-solid fa-link"></i></button>
+            </div>
+        </div>
+
+        <!-- PROJECTS CARD -->
+        <div class="card hidden-right" id="projects-card">
+            <h2>projects</h2>
+
+            <div class="projects-grid">
+                <a href="./novahouse/" class="project-card">
+                    <div class="project-icon"><i class="fa-solid fa-house-signal"></i></div>
+                    <div class="project-info">
+                        <div class="project-name">novahouse</div>
+                        <div class="project-desc">telegram smart home bot</div>
+                    </div>
+                    <i class="fa-solid fa-arrow-right project-arrow"></i>
+                </a>
+
+                <a href="https://windos.nn1kk00.ru" target="_blank" class="project-card">
+                    <div class="project-icon"><i class="fa-solid fa-cloud"></i></div>
+                    <div class="project-info">
+                        <div class="project-name">windos</div>
+                        <div class="project-desc">cloud os project</div>
+                    </div>
+                    <i class="fa-solid fa-arrow-up-right-from-square project-arrow"></i>
+                </a>
+            </div>
+
+            <button class="btn-back" onclick="navigate('projects-card', 'profile-card', 'right')"><i class="fa-solid fa-arrow-left"></i> back</button>
+        </div>
+
+        <!-- CONTACT CARD -->
+        <div class="card hidden-left" id="contact-card">
+            <h2>socials</h2>
+
+            <div class="links-container">
+                <a href="https://www.youtube.com/@winmastt" target="_blank" class="social-btn">
+                    <i class="fa-brands fa-youtube"></i> youtube
+                </a>
+                <a href="https://www.twitch.tv/winmastt_" target="_blank" class="social-btn">
+                    <i class="fa-brands fa-twitch"></i> twitch
+                </a>
+                <a href="https://t.me/winmastt" class="social-btn">
+                    <i class="fa-brands fa-telegram"></i> telegram
+                </a>
+                <a href="https://steamcommunity.com/profiles/76561199177999897/" target="_blank" class="social-btn">
+                    <i class="fa-brands fa-steam"></i> steam
+                </a>
+                <div class="social-btn" onclick="copyDiscord()">
+                    <i class="fa-brands fa-discord"></i> @winmastt
+                </div>
+            </div>
+
+            <button class="btn-back" onclick="navigate('contact-card', 'profile-card', 'left')"><i class="fa-solid fa-arrow-left"></i> back</button>
+        </div>
+
+    </div>
+
+    <div id="toast">copied to clipboard ✓</div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Typewriter effect
+            const text = "winmastt";
+            const el = document.getElementById("typewriter");
+            let i = 0;
+            
+            function type() {
+                if (i < text.length) {
+                    el.innerHTML += text.charAt(i++);
+                    setTimeout(type, 150);
+                }
+            }
+            setTimeout(type, 300);
+
+            // Navigation Logic (Smooth sliding)
+            window.navigate = (fromId, toId, direction) => {
+                const from = document.getElementById(fromId);
+                const to = document.getElementById(toId);
+                
+                from.classList.remove('active');
+                from.classList.add(direction === 'left' ? 'hidden-left' : 'hidden-right');
+                
+                to.classList.remove('hidden-left', 'hidden-right');
+                to.classList.add('active');
+            };
+
+            // Copy to clipboard
+            window.copyDiscord = () => {
+                navigator.clipboard.writeText("winmastt").then(() => {
+                    const toast = document.getElementById("toast");
+                    toast.classList.add("show");
+                    setTimeout(() => toast.classList.remove("show"), 2500);
+                });
+            };
+
+            // 3D Tilt Effect & Dynamic Background (Desktop only for performance)
+            if (window.matchMedia("(pointer: fine)").matches) {
+                document.addEventListener("mousemove", (e) => {
+                    const { clientX: x, clientY: y } = e;
+                    const { innerWidth: w, innerHeight: h } = window;
+                    
+                    // Tilt calculations
+                    const rx = ((y / h) - 0.5) * -12; // max rotation degrees
+                    const ry = ((x / w) - 0.5) * 12;
+                    
+                    // Apply to CSS variables
+                    document.documentElement.style.setProperty('--rx', `${rx}deg`);
+                    document.documentElement.style.setProperty('--ry', `${ry}deg`);
+                    
+                    // Background glow follow cursor
+                    document.documentElement.style.setProperty('--bg-x', `${(x / w) * 100}%`);
+                    document.documentElement.style.setProperty('--bg-y', `${(y / h) * 100}%`);
+                });
+
+                // Reset on mouse leave
+                document.addEventListener("mouseleave", () => {
+                    document.documentElement.style.setProperty('--rx', `0deg`);
+                    document.documentElement.style.setProperty('--ry', `0deg`);
+                    document.documentElement.style.setProperty('--bg-x', `50%`);
+                    document.documentElement.style.setProperty('--bg-y', `50%`);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
