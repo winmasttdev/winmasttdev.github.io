@@ -393,6 +393,9 @@ body {
 
     .polaroid-photo {
         transform: rotate(var(--rotation));
+        width: calc(50vw - 25px);
+        max-width: 160px;
+        padding: 8px 8px 20px 8px; /* Slightly smaller padding on mobile */
     }
 
     /* Slide-in animations for mobile slots */
@@ -640,4 +643,26 @@ body {
     position: relative;
     top: -45px; /* Positioned inside the white bottom border */
     z-index: 1005;
+}
+
+/* Mobile Typography Fixes */
+@media (max-width: 480px) {
+    .letter-paper {
+        padding: 25px 20px;
+    }
+    .letter-paper::before {
+        left: 30px;
+    }
+    .letter-header {
+        font-size: 26px;
+        padding-left: 15px;
+    }
+    .letter-text {
+        font-size: 17px;
+        padding-left: 15px;
+        text-indent: 15px;
+    }
+    .letter-signature {
+        font-size: 19px;
+    }
 }
