@@ -1,0 +1,643 @@
+/* ==========================================================================
+   DESKTOP SCRAPBOOK DESIGN SYSTEM // EST. 2026
+   ========================================================================== */
+
+   :root {
+    --bg-wood: #fafaf6;
+    --paper-white: #ffffff;
+    --paper-shadow: rgba(0, 0, 0, 0.08);
+    --polaroid-shadow: 0 8px 24px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06);
+    --envelope-color: #f3eae1;
+    --envelope-flap-color: #e5dbd0;
+    --envelope-shadow: rgba(60, 50, 40, 0.15);
+    
+    /* Font stacks */
+    --font-handwritten: 'Caveat', cursive;
+    --font-body: 'Montserrat', sans-serif;
+    --font-ui: 'Outfit', sans-serif;
+    --font-digital: 'Share Tech Mono', monospace;
+}
+
+/* Base resets */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-color: var(--bg-wood);
+    font-family: var(--font-body);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ==========================================================================
+   WHITE WOODEN TABLE SURFACE
+   ========================================================================== */
+
+.table-surface {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 15px;
+    
+    /* Realistic white painted wood planks */
+    background-color: #f7f7f3;
+    background-image: 
+        /* Plank seams */
+        linear-gradient(90deg, transparent 178px, rgba(140, 130, 110, 0.07) 178px, rgba(140, 130, 110, 0.14) 180px, transparent 180px),
+        /* Plank 3D highlight */
+        linear-gradient(90deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 70%),
+        /* Very subtle repeating wood grain lines */
+        repeating-linear-gradient(90deg, rgba(100, 90, 80, 0.015) 0px, rgba(100, 90, 80, 0.015) 2px, transparent 2px, transparent 12px);
+    background-size: 180px 100%, 180px 100%, 35px 100%;
+}
+
+.table-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    box-shadow: inset 0 0 100px rgba(0,0,0,0.05);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.sun-glare {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50vw;
+    height: 50vw;
+    background: radial-gradient(circle, rgba(255, 240, 200, 0.15) 0%, rgba(255,255,255,0) 70%);
+    pointer-events: none;
+    z-index: 3;
+}
+
+/* ==========================================================================
+   VINTAGE ENVELOPE (POWER-ON / UNLOCK SPLASH)
+   ========================================================================== */
+
+.envelope-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    z-index: 20;
+    transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.5s;
+}
+
+.envelope-wrapper.fade-out {
+    transform: scale(0.8) translateY(-50px);
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+}
+
+.envelope {
+    position: relative;
+    width: 280px;
+    height: 180px;
+    background-color: var(--envelope-color);
+    border-radius: 6px;
+    box-shadow: 
+        0 8px 25px var(--envelope-shadow),
+        0 1px 3px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transform: rotate(-1deg);
+    transition: transform 0.3s;
+}
+
+.envelope:hover {
+    transform: rotate(1deg) scale(1.03);
+}
+
+.envelope-flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 140px solid transparent;
+    border-right: 140px solid transparent;
+    border-top: 100px solid var(--envelope-flap-color);
+    border-radius: 6px 6px 0 0;
+    z-index: 3;
+    transform-origin: top;
+    transition: transform 0.4s;
+}
+
+.envelope:hover .envelope-flap {
+    transform: rotateX(20deg);
+}
+
+.envelope-body {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+/* Seal wax graphic */
+.envelope-seal {
+    font-size: 32px;
+    filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15));
+    animation: bounceSeal 2s infinite ease-in-out;
+    margin-top: 40px;
+    z-index: 4;
+}
+
+@keyframes bounceSeal {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.envelope-front-text {
+    font-family: var(--font-handwritten);
+    font-size: 22px;
+    font-weight: bold;
+    color: #8c7d70;
+    margin-top: 15px;
+    z-index: 4;
+}
+
+.envelope-hint {
+    font-size: 13px;
+    color: #8c7d70;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-align: center;
+}
+
+/* ==========================================================================
+   THE HANDWRITTEN LETTER
+   ========================================================================== */
+
+.letter-card {
+    width: 100%;
+    max-width: 460px;
+    z-index: 10;
+    transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.8s;
+}
+
+.letter-card.hidden {
+    opacity: 0;
+    transform: scale(0.9) translateY(40px);
+    pointer-events: none;
+    position: absolute;
+}
+
+.letter-paper {
+    background: #ffffff;
+    padding: 35px 30px;
+    border-radius: 4px;
+    box-shadow: 
+        0 15px 35px var(--paper-shadow),
+        0 1px 3px rgba(0,0,0,0.05),
+        inset 0 0 40px rgba(0,0,0,0.02);
+    position: relative;
+    border: 1px solid rgba(0,0,0,0.04);
+}
+
+/* Notebook lines details */
+.letter-paper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 45px;
+    width: 1px;
+    height: 100%;
+    background-color: rgba(255, 0, 0, 0.15); /* Red vertical margin line */
+}
+
+.letter-header {
+    font-family: var(--font-handwritten);
+    font-size: 32px;
+    color: #2b2b2b;
+    margin-bottom: 25px;
+    padding-left: 25px;
+    line-height: 1.2;
+}
+
+.letter-text {
+    font-family: var(--font-handwritten);
+    font-size: 20px;
+    line-height: 1.6;
+    color: #3b3b3b;
+    margin-bottom: 18px;
+    text-indent: 25px;
+    padding-left: 25px;
+}
+
+.letter-signature {
+    font-family: var(--font-handwritten);
+    font-size: 22px;
+    font-weight: bold;
+    color: #4a4a4a;
+    text-align: right;
+    margin-top: 35px;
+}
+
+/* ==========================================================================
+   POLAROID PICTURE FRAMES (SLIDE-IN ON DESKTOP & GRID ON MOBILE)
+   ========================================================================== */
+
+.photos-container {
+    width: 100%;
+    z-index: 5;
+}
+
+.polaroid-photo {
+    background-color: var(--paper-white);
+    padding: 12px 12px 30px 12px;
+    box-shadow: var(--polaroid-shadow);
+    border-radius: 2px;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s, z-index 0.1s;
+    cursor: pointer;
+    width: 155px; /* Perfect size to fit mobile in a 2x2 grid */
+    position: relative;
+}
+
+.polaroid-photo.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.polaroid-image-wrapper {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background-color: #eee;
+    border: 1px solid rgba(0,0,0,0.06);
+}
+
+.polaroid-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.polaroid-caption {
+    font-family: var(--font-handwritten);
+    font-size: 16px;
+    color: #444;
+    text-align: center;
+    margin-top: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.polaroid-photo:hover {
+    transform: scale(1.08) rotate(0deg) !important;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.18);
+    z-index: 50;
+}
+
+/* Desktop layout: absolute positioning around the letter */
+@media (min-width: 900px) {
+    .photos-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+    
+    .polaroid-photo {
+        position: absolute;
+        pointer-events: auto;
+        width: 175px; /* Larger size on desktop */
+    }
+
+    #photo-1 {
+        top: 8%;
+        left: 10%;
+        transform: rotate(var(--rotation));
+    }
+    #photo-2 {
+        bottom: 8%;
+        left: 12%;
+        transform: rotate(var(--rotation));
+    }
+    #photo-3 {
+        top: 8%;
+        right: 10%;
+        transform: rotate(var(--rotation));
+    }
+    #photo-4 {
+        bottom: 8%;
+        right: 12%;
+        transform: rotate(var(--rotation));
+    }
+
+    /* Slide in animation triggers */
+    .polaroid-photo.slide-from-left.animate {
+        animation: slide-in-left 1.2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+    }
+    .polaroid-photo.slide-from-right.animate {
+        animation: slide-in-right 1.2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+    }
+
+    @keyframes slide-in-left {
+        from {
+            transform: translate(-350px, 50px) rotate(-35deg);
+            opacity: 0;
+        }
+        to {
+            transform: translate(0, 0) rotate(var(--rotation));
+            opacity: 1;
+        }
+    }
+    @keyframes slide-in-right {
+        from {
+            transform: translate(350px, 50px) rotate(35deg);
+            opacity: 0;
+        }
+        to {
+            transform: translate(0, 0) rotate(var(--rotation));
+            opacity: 1;
+        }
+    }
+}
+
+/* Mobile & Tablet layout: 2x2 grid below the letter */
+@media (max-width: 899px) {
+    .photos-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        justify-items: center;
+        max-width: 460px;
+        margin-top: 30px;
+        margin-bottom: 90px; /* Space for absolute floating walkman */
+    }
+
+    .polaroid-photo {
+        transform: rotate(var(--rotation));
+    }
+
+    /* Slide-in animations for mobile slots */
+    .polaroid-photo.slide-from-left.animate {
+        animation: mobile-slide-left 1s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+    }
+    .polaroid-photo.slide-from-right.animate {
+        animation: mobile-slide-right 1s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+    }
+
+    @keyframes mobile-slide-left {
+        from {
+            transform: translateX(-150px) rotate(-15deg);
+            opacity: 0;
+        }
+        to {
+            transform: rotate(var(--rotation));
+            opacity: 1;
+        }
+    }
+    @keyframes mobile-slide-right {
+        from {
+            transform: translateX(150px) rotate(15deg);
+            opacity: 0;
+        }
+        to {
+            transform: rotate(var(--rotation));
+            opacity: 1;
+        }
+    }
+}
+
+/* ==========================================================================
+   RETRO AUDIO CASSETTE PLAYER (WALKMAN STYLE)
+   ========================================================================== */
+
+.retro-player {
+    z-index: 15;
+    margin-top: 40px;
+    width: 280px;
+    transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.8s;
+}
+
+.retro-player.hidden {
+    opacity: 0;
+    transform: scale(0.9) translateY(40px);
+    pointer-events: none;
+    position: absolute;
+}
+
+.player-body {
+    background: linear-gradient(135deg, #2b303c 0%, #151821 100%);
+    border: 3px solid #4a5163;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 
+        0 10px 25px rgba(0,0,0,0.3),
+        inset 0 1px 1px rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cassette-window {
+    background-color: #0b0c10;
+    border-radius: 6px;
+    border: 2px solid #333946;
+    height: 54px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+}
+
+.cassette-wheels {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100px;
+    margin: 2px auto 0 auto;
+}
+
+.wheel {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffe259 30%, #444 40%, #000 70%);
+    border: 2px dashed #777;
+}
+
+.wheel.spinning {
+    animation: rotateSpool 4s linear infinite;
+}
+
+.tape-indicator {
+    font-family: var(--font-digital);
+    font-size: 8px;
+    color: #ffe259;
+    text-align: center;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 0 0 2px rgba(255, 226, 89, 0.4);
+}
+
+.player-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.player-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #555e72 0%, #20242f 80%);
+    border: 1px solid #444c5c;
+    border-top-color: #8c9bb7;
+    color: #e2e8f0;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 
+        0 2px 4px rgba(0,0,0,0.3),
+        inset 0 1px 1px rgba(255,255,255,0.1);
+    outline: none;
+}
+
+.player-btn:active {
+    background: linear-gradient(180deg, #151821 0%, #2b303c 100%);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.6);
+}
+
+.player-btn svg {
+    color: #ffe259;
+}
+
+.player-volume-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.5);
+}
+
+.player-volume {
+    width: 70px;
+    height: 3px;
+    -webkit-appearance: none;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+    outline: none;
+}
+
+.player-volume::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ffe259;
+    cursor: pointer;
+}
+
+/* Pin walkman to bottom float on small mobile screens */
+@media (max-width: 899px) {
+    .retro-player {
+        position: fixed;
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-top: 0;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+    }
+    
+    .retro-player.hidden {
+        transform: translateX(-50%) translateY(120%);
+    }
+}
+
+/* ==========================================================================
+   LIGHTBOX OVERLAY (PHOTO ZOOM)
+   ========================================================================== */
+
+.lightbox {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    padding-top: 50px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(12, 14, 19, 0.95);
+    backdrop-filter: blur(8px);
+}
+
+.lightbox-content {
+    margin: auto;
+    display: block;
+    width: 90%;
+    max-width: 500px;
+    border: 15px solid #fff;
+    border-bottom: 50px solid #fff;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    animation: zoom-anim 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+}
+
+@keyframes zoom-anim {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+    cursor: pointer;
+    z-index: 1010;
+}
+
+.lightbox-close:hover,
+.lightbox-close:focus {
+    color: var(--accent-cyan);
+    text-decoration: none;
+}
+
+.lightbox-caption {
+    margin: auto;
+    display: block;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    color: #222;
+    padding: 10px 0;
+    font-family: var(--font-handwritten);
+    font-size: 26px;
+    position: relative;
+    top: -45px; /* Positioned inside the white bottom border */
+    z-index: 1005;
+}
