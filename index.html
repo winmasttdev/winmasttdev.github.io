@@ -15,185 +15,25 @@
             overflow: hidden;
         }
 
-        /* Frutiger Aero desktop wallpaper */
         body {
-            background:
-                radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.3) 0%, transparent 60%),
-                linear-gradient(180deg,
-                    #4a90d9 0%,
-                    #6db3f2 20%,
-                    #8ecfff 35%,
-                    #b8e6a8 60%,
-                    #7dcf67 80%,
-                    #4fb345 100%
-                );
-        }
-
-        /* Desktop area */
-        .desktop {
-            width: 100%;
-            height: calc(100% - 40px);
-            position: relative;
-        }
-
-        /* Windows */
-        .window {
-            position: absolute;
-        }
-
-        .window-profile {
-            width: 350px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        /* Desktop icons */
-        .desktop-icons {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .desktop-icon {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 70px;
-            padding: 8px 4px;
-            border-radius: 3px;
-            cursor: pointer;
-            text-align: center;
-        }
-
-        .desktop-icon:hover {
-            background: rgba(100, 180, 255, 0.35);
-        }
-
-        .desktop-icon i {
-            font-size: 2rem;
-            color: #fff;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            margin-bottom: 4px;
-        }
-
-        .desktop-icon span {
-            color: #fff;
-            font-size: 0.65rem;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.9);
-            line-height: 1.2;
-        }
-
-        /* Taskbar */
-        .taskbar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 40px;
             background: linear-gradient(180deg,
-                rgba(80,130,200,0.9) 0%,
-                rgba(50,90,160,0.95) 50%,
-                rgba(30,60,120,0.98) 100%
+                #4a90d9 0%,
+                #6db3f2 20%,
+                #8ecfff 35%,
+                #b8e6a8 60%,
+                #7dcf67 80%,
+                #4fb345 100%
             );
-            border-top: 1px solid rgba(255,255,255,0.3);
-            z-index: 1000;
             display: flex;
-            align-items: center;
-        }
-
-        .start-btn {
-            width: 50px;
-            height: 30px;
-            margin-left: 4px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #5cb85c, #3d913d, #2d672d);
-            border: 1px solid rgba(0,0,0,0.2);
-            display: flex;
-            align-items: center;
             justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3);
-        }
-
-        .start-btn i {
-            color: #fff;
-            font-size: 14px;
-            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
-        }
-
-        .taskbar-divider {
-            width: 1px;
-            height: 26px;
-            background: rgba(255,255,255,0.2);
-            margin: 0 8px;
-        }
-
-        .taskbar-items {
-            flex: 1;
-            display: flex;
             align-items: center;
-            gap: 4px;
-            height: 100%;
         }
 
-        .taskbar-item {
-            height: 28px;
-            padding: 0 12px;
-            border-radius: 3px;
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.2);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #fff;
-            font-size: 0.68rem;
-            cursor: pointer;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-            max-width: 160px;
-            white-space: nowrap;
-            overflow: hidden;
+        .window {
+            width: 360px;
         }
 
-        .taskbar-item.active {
-            background: rgba(255,255,255,0.3);
-            border-color: rgba(255,255,255,0.4);
-        }
-
-        .taskbar-item i { font-size: 11px; }
-
-        .system-tray {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0 12px;
-            height: 100%;
-            border-left: 1px solid rgba(255,255,255,0.15);
-            margin-left: 4px;
-        }
-
-        .system-tray i {
-            color: #fff;
-            font-size: 12px;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-        }
-
-        .tray-clock {
-            color: #fff;
-            font-size: 0.68rem;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-            text-align: center;
-            line-height: 1.2;
-        }
-
-        /* Profile content */
-        .profile-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .profile {
             text-align: center;
         }
 
@@ -207,30 +47,31 @@
             margin-bottom: 12px;
         }
 
-        .profile-name {
+        .name {
             font-size: 1.1rem;
             font-weight: bold;
             color: #333;
             margin-bottom: 4px;
         }
 
-        .profile-status {
+        .status {
             font-size: 0.72rem;
             color: #666;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 5px;
             margin-bottom: 12px;
         }
 
-        .profile-status .dot {
+        .status .dot {
             width: 8px;
             height: 8px;
             background: #22c55e;
             border-radius: 50%;
         }
 
-        .profile-desc {
+        .desc {
             font-size: 0.78rem;
             color: #555;
             line-height: 1.6;
@@ -257,10 +98,16 @@
         .btn-row {
             display: flex;
             gap: 8px;
+            justify-content: center;
         }
 
-        /* Projects list */
-        .project-item {
+        .projects-list, .socials-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .item {
             display: flex;
             align-items: center;
             gap: 10px;
@@ -268,15 +115,15 @@
             text-decoration: none;
             color: #333;
             border-radius: 3px;
-            margin-bottom: 4px;
-            transition: background 0.15s;
+            font-size: 0.78rem;
+            cursor: pointer;
         }
 
-        .project-item:hover {
+        .item:hover {
             background: #e8f0fe;
         }
 
-        .project-item i {
+        .item i {
             width: 28px;
             height: 28px;
             display: flex;
@@ -289,54 +136,13 @@
             border: 1px solid #c4d8f5;
         }
 
-        .project-info { flex: 1; }
+        .item .info { flex: 1; }
+        .item .info .title { font-weight: 600; }
+        .item .info .sub { font-size: 0.68rem; color: #777; }
 
-        .project-name {
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .project-desc {
-            font-size: 0.68rem;
-            color: #777;
-        }
-
-        /* Socials */
-        .social-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 12px;
-            text-decoration: none;
-            color: #333;
-            font-size: 0.78rem;
-            border-radius: 3px;
-            margin-bottom: 4px;
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-
-        .social-item:hover {
-            background: #e8f0fe;
-        }
-
-        .social-item i {
-            font-size: 14px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .fa-youtube { color: #c4302b; }
-        .fa-twitch { color: #6441a5; }
-        .fa-telegram { color: #0088cc; }
-        .fa-steam { color: #1b2838; }
-        .fa-discord { color: #5865f2; }
-
-        /* Toast */
         .toast {
             position: fixed;
-            bottom: 50px;
+            bottom: 20px;
             left: 50%;
             transform: translate(-50%, 20px);
             background: #333;
@@ -347,154 +153,108 @@
             opacity: 0;
             transition: all 0.3s;
             pointer-events: none;
-            z-index: 2000;
         }
 
-        .toast.show {
-            opacity: 1;
-            transform: translate(-50%, 0);
-        }
+        .toast.show { opacity: 1; transform: translate(-50%, 0); }
     </style>
 </head>
 <body>
 
-    <div class="desktop">
-
-        <!-- Desktop Icons -->
-        <div class="desktop-icons">
-            <div class="desktop-icon" onclick="document.getElementById('window-profile').style.display='block'">
-                <i class="fa-solid fa-user"></i>
-                <span>About Me</span>
-            </div>
-            <div class="desktop-icon" onclick="document.getElementById('window-projects').style.display='block'">
-                <i class="fa-solid fa-code"></i>
-                <span>Projects</span>
-            </div>
-            <div class="desktop-icon" onclick="document.getElementById('window-socials').style.display='block'">
-                <i class="fa-solid fa-share-nodes"></i>
-                <span>Socials</span>
+    <!-- Profile Window -->
+    <div class="window active" id="profile">
+        <div class="title-bar">
+            <div class="title-bar-text">deviwoo</div>
+            <div class="title-bar-controls">
+                <button aria-label="Minimize"></button>
+                <button aria-label="Maximize"></button>
+                <button aria-label="Close"></button>
             </div>
         </div>
-
-        <!-- Profile Window -->
-        <div class="window window-profile active" id="window-profile">
-            <div class="title-bar">
-                <div class="title-bar-text">deviwoo — About Me</div>
-                <div class="title-bar-controls">
-                    <button aria-label="Minimize"></button>
-                    <button aria-label="Maximize"></button>
-                    <button aria-label="Close" onclick="document.getElementById('window-profile').style.display='none'"></button>
+        <div class="window-body has-space">
+            <div class="profile">
+                <img src="./avatar.png" alt="deviwoo" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=d&background=5dade2&color=fff'">
+                <div class="name">deviwoo</div>
+                <div class="status"><span class="dot"></span> online</div>
+                <p class="desc">
+                    windows / linux / android / AI dev.<br>
+                    building autonomous computer vision systems.<br>
+                    streamer on twitch, videos on youtube.
+                </p>
+                <div class="tags">
+                    <span class="tag">#ai-sentinel</span>
+                    <span class="tag">#computer-vision</span>
+                    <span class="tag">#linux</span>
+                    <span class="tag">#android</span>
+                    <span class="tag">#pytorch</span>
                 </div>
-            </div>
-            <div class="window-body has-space">
-                <div class="profile-content">
-                    <img src="./avatar.png" alt="deviwoo" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=d&background=5dade2&color=fff'">
-                    <div class="profile-name">deviwoo</div>
-                    <div class="profile-status"><span class="dot"></span> online</div>
-                    <p class="profile-desc">
-                        windows / linux / android / AI dev.<br>
-                        building autonomous computer vision systems.<br>
-                        streamer on twitch, videos on youtube.
-                    </p>
-                    <div class="tags">
-                        <span class="tag">#ai-sentinel</span>
-                        <span class="tag">#computer-vision</span>
-                        <span class="tag">#linux</span>
-                        <span class="tag">#android</span>
-                        <span class="tag">#pytorch</span>
-                    </div>
-                    <div class="btn-row">
-                        <button onclick="document.getElementById('window-projects').style.display='block'">my projects</button>
-                        <button onclick="document.getElementById('window-socials').style.display='block'">socials</button>
-                    </div>
+                <div class="btn-row">
+                    <button onclick="document.getElementById('profile').style.display='none';document.getElementById('projects').style.display='block'">my projects</button>
+                    <button onclick="document.getElementById('profile').style.display='none';document.getElementById('socials').style.display='block'">socials</button>
                 </div>
             </div>
         </div>
-
-        <!-- Projects Window -->
-        <div class="window window-projects" id="window-projects" style="display:none;width:380px;top:8%;left:8%;">
-            <div class="title-bar">
-                <div class="title-bar-text">deviwoo — Projects</div>
-                <div class="title-bar-controls">
-                    <button aria-label="Minimize"></button>
-                    <button aria-label="Maximize"></button>
-                    <button aria-label="Close" onclick="document.getElementById('window-projects').style.display='none'"></button>
-                </div>
-            </div>
-            <div class="window-body has-space">
-                <a href="https://github.com/winmasttdev/aegis-sentinel-ai" target="_blank" class="project-item">
-                    <i class="fa-solid fa-shield-halved"></i>
-                    <div class="project-info">
-                        <div class="project-name">aegis sentinel ai ⭐</div>
-                        <div class="project-desc">autonomous room defense & AI security engine</div>
-                    </div>
-                </a>
-                <a href="novahouse/index.html" class="project-item">
-                    <i class="fa-solid fa-house-signal"></i>
-                    <div class="project-info">
-                        <div class="project-name">novahouse</div>
-                        <div class="project-desc">telegram smart home bot</div>
-                    </div>
-                </a>
-                <a href="https://winmasttdev.github.io/windOS-Assist-Web/" target="_blank" class="project-item">
-                    <i class="fa-solid fa-robot"></i>
-                    <div class="project-info">
-                        <div class="project-name">windOS Assist</div>
-                        <div class="project-desc">remote orchestration & AI system assistant</div>
-                    </div>
-                </a>
-                <a href="https://windos.nn1kk00.ru" target="_blank" class="project-item">
-                    <i class="fa-solid fa-cloud"></i>
-                    <div class="project-info">
-                        <div class="project-name">windos</div>
-                        <div class="project-desc">cloud os project</div>
-                    </div>
-                </a>
-            </div>
-        </div>
-
-        <!-- Socials Window -->
-        <div class="window window-socials" id="window-socials" style="display:none;width:320px;top:12%;right:6%;">
-            <div class="title-bar">
-                <div class="title-bar-text">deviwoo — Socials</div>
-                <div class="title-bar-controls">
-                    <button aria-label="Minimize"></button>
-                    <button aria-label="Maximize"></button>
-                    <button aria-label="Close" onclick="document.getElementById('window-socials').style.display='none'"></button>
-                </div>
-            </div>
-            <div class="window-body has-space">
-                <a href="https://www.youtube.com/@deviwooo" target="_blank" class="social-item">
-                    <i class="fa-brands fa-youtube"></i> youtube
-                </a>
-                <a href="https://www.twitch.tv/winmastt_" target="_blank" class="social-item">
-                    <i class="fa-brands fa-twitch"></i> twitch
-                </a>
-                <a href="https://t.me/deviwoo" class="social-item">
-                    <i class="fa-brands fa-telegram"></i> telegram
-                </a>
-                <a href="https://steamcommunity.com/profiles/76561199177999897/" target="_blank" class="social-item">
-                    <i class="fa-brands fa-steam"></i> steam
-                </a>
-                <div class="social-item" onclick="copyDiscord()">
-                    <i class="fa-brands fa-discord"></i> @winmastt (click to copy)
-                </div>
-            </div>
-        </div>
-
     </div>
 
-    <!-- Taskbar -->
-    <div class="taskbar">
-        <div class="start-btn">
-            <i class="fa-brands fa-windows"></i>
+    <!-- Projects Window -->
+    <div class="window" id="projects" style="display:none;">
+        <div class="title-bar">
+            <div class="title-bar-text">projects</div>
+            <div class="title-bar-controls">
+                <button aria-label="Minimize"></button>
+                <button aria-label="Maximize"></button>
+                <button aria-label="Close" onclick="document.getElementById('projects').style.display='none';document.getElementById('profile').style.display='block'"></button>
+            </div>
         </div>
-        <div class="taskbar-divider"></div>
-        <div class="taskbar-items" id="taskbar-items"></div>
-        <div class="system-tray">
-            <i class="fa-solid fa-wifi"></i>
-            <i class="fa-solid fa-volume-high"></i>
-            <div class="tray-clock" id="clock">12:00<br>08/08/2026</div>
+        <div class="window-body has-space">
+            <div class="projects-list">
+                <a href="https://github.com/winmasttdev/aegis-sentinel-ai" target="_blank" class="item">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <div class="info"><div class="title">aegis sentinel ai ⭐</div><div class="sub">autonomous room defense & AI security engine</div></div>
+                </a>
+                <a href="novahouse/index.html" class="item">
+                    <i class="fa-solid fa-house-signal"></i>
+                    <div class="info"><div class="title">novahouse</div><div class="sub">telegram smart home bot</div></div>
+                </a>
+                <a href="https://winmasttdev.github.io/windOS-Assist-Web/" target="_blank" class="item">
+                    <i class="fa-solid fa-robot"></i>
+                    <div class="info"><div class="title">windOS Assist</div><div class="sub">remote orchestration & AI system assistant</div></div>
+                </a>
+                <a href="https://windos.nn1kk00.ru" target="_blank" class="item">
+                    <i class="fa-solid fa-cloud"></i>
+                    <div class="info"><div class="title">windos</div><div class="sub">cloud os project</div></div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Socials Window -->
+    <div class="window" id="socials" style="display:none;">
+        <div class="title-bar">
+            <div class="title-bar-text">socials</div>
+            <div class="title-bar-controls">
+                <button aria-label="Minimize"></button>
+                <button aria-label="Maximize"></button>
+                <button aria-label="Close" onclick="document.getElementById('socials').style.display='none';document.getElementById('profile').style.display='block'"></button>
+            </div>
+        </div>
+        <div class="window-body has-space">
+            <div class="socials-list">
+                <a href="https://www.youtube.com/@deviwooo" target="_blank" class="item">
+                    <i class="fa-brands fa-youtube"></i> youtube
+                </a>
+                <a href="https://www.twitch.tv/winmastt_" target="_blank" class="item">
+                    <i class="fa-brands fa-twitch"></i> twitch
+                </a>
+                <a href="https://t.me/deviwoo" class="item">
+                    <i class="fa-brands fa-telegram"></i> telegram
+                </a>
+                <a href="https://steamcommunity.com/profiles/76561199177999897/" target="_blank" class="item">
+                    <i class="fa-brands fa-steam"></i> steam
+                </a>
+                <div class="item" onclick="copyDiscord()">
+                    <i class="fa-brands fa-discord"></i> @winmastt
+                </div>
+            </div>
         </div>
     </div>
 
@@ -509,42 +269,12 @@
             });
         }
 
-        // Clock
-        function tick() {
-            const d = new Date();
-            document.getElementById('clock').innerHTML =
-                String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0') +
-                '<br>' + String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
-        }
-        setInterval(tick, 1000);
-        tick();
-
-        // Make windows draggable
-        document.querySelectorAll('.title-bar').forEach(tb => {
-            const win = tb.closest('.window');
-            let drag = false, ox, oy;
-            tb.addEventListener('mousedown', e => {
-                if (e.target.closest('button')) return;
-                drag = true;
-                ox = e.clientX - win.getBoundingClientRect().left;
-                oy = e.clientY - win.getBoundingClientRect().top;
-                win.style.position = 'fixed';
-            });
-            document.addEventListener('mousemove', e => {
-                if (!drag) return;
-                win.style.left = (e.clientX - ox) + 'px';
-                win.style.top = (e.clientY - oy) + 'px';
-                win.style.transform = 'none';
-            });
-            document.addEventListener('mouseup', () => drag = false);
-        });
-
-        // Easter egg
+        // Konami code easter egg
         const code = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
         let idx = 0;
         document.addEventListener('keydown', e => {
             idx = e.key === code[idx] ? idx + 1 : 0;
-            if (idx === code.length) { idx = 0; alert('🌿 Easter egg! Konami code activated! 🌿'); }
+            if (idx === code.length) { idx = 0; alert('🌿 easter egg! 🌿'); }
         });
     </script>
 </body>
