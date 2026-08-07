@@ -29,10 +29,73 @@
             align-items: center;
         }
 
-        .window {
-            width: 360px;
+        /* Window container - all windows relative to center */
+        .windows-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
+        .window {
+            position: absolute;
+        }
+
+        /* Main window always centered */
+        .window-main {
+            z-index: 10;
+        }
+
+        /* Side windows slide out from center */
+        .window-side {
+            z-index: 5;
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease, filter 0.4s ease;
+        }
+
+        .window-projects {
+            transform: translateX(calc(-100% - 30px%));
+            opacity: 0;
+            filter: blur(8px);
+            pointer-events: none;
+        }
+
+        .window-projects.open {
+            transform: translateX(calc(-100% - 30px));
+            opacity: 1;
+            filter: blur(0);
+            pointer-events: all;
+        }
+
+        .window-socials {
+            transform: translateX(calc(100% + 30px));
+            opacity: 0;
+            filter: blur(8px);
+            pointer-events: none;
+        }
+
+        .window-socials.open {
+            transform: translateX(calc(100% + 30px));
+            opacity: 1;
+            filter: blur(0);
+            pointer-events: all;
+        }
+
+        /* When only one side is open, we can adjust spacing */
+        .window-main {
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .window-main.shift-left {
+            transform: translateX(-180px);
+        }
+
+        .window-main.shift-right {
+            transform: translateX(180px);
+        }
+
+        /* Profile content */
         .profile {
             text-align: center;
         }
@@ -156,106 +219,119 @@
         }
 
         .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+        @media (max-width: 900px) {
+            .window-projects, .window-projects.open {
+                transform: translateX(-50%) translateY(calc(-100% - 20px));
+            }
+            .window-socials, .window-socials.open {
+                transform: translateX(-50%) translateY(calc(100% + 20px));
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Profile Window -->
-    <div class="window active" id="profile">
-        <div class="title-bar">
-            <div class="title-bar-text">deviwoo</div>
-            <div class="title-bar-controls">
-                <button aria-label="Minimize"></button>
-                <button aria-label="Maximize"></button>
-                <button aria-label="Close"></button>
-            </div>
-        </div>
-        <div class="window-body has-space">
-            <div class="profile">
-                <img src="./avatar.png" alt="deviwoo" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=d&background=5dade2&color=fff'">
-                <div class="name">deviwoo</div>
-                <div class="status"><span class="dot"></span> online</div>
-                <p class="desc">
-                    windows / linux / android / AI dev.<br>
-                    building autonomous computer vision systems.<br>
-                    streamer on twitch, videos on youtube.
-                </p>
-                <div class="tags">
-                    <span class="tag">#ai-sentinel</span>
-                    <span class="tag">#computer-vision</span>
-                    <span class="tag">#linux</span>
-                    <span class="tag">#android</span>
-                    <span class="tag">#pytorch</span>
-                </div>
-                <div class="btn-row">
-                    <button onclick="document.getElementById('profile').style.display='none';document.getElementById('projects').style.display='block'">my projects</button>
-                    <button onclick="document.getElementById('profile').style.display='none';document.getElementById('socials').style.display='block'">socials</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="windows-container">
 
-    <!-- Projects Window -->
-    <div class="window" id="projects" style="display:none;">
-        <div class="title-bar">
-            <div class="title-bar-text">projects</div>
-            <div class="title-bar-controls">
-                <button aria-label="Minimize"></button>
-                <button aria-label="Maximize"></button>
-                <button aria-label="Close" onclick="document.getElementById('projects').style.display='none';document.getElementById('profile').style.display='block'"></button>
+        <!-- Projects Window (slides out left) -->
+        <div class="window active window-side window-projects" id="window-projects">
+            <div class="title-bar">
+                <div class="title-bar-text">projects</div>
+                <div class="title-bar-controls">
+                    <button aria-label="Minimize"></button>
+                    <button aria-label="Maximize"></button>
+                    <button aria-label="Close" onclick="toggleProjects()"></button>
+                </div>
             </div>
-        </div>
-        <div class="window-body has-space">
-            <div class="projects-list">
-                <a href="https://github.com/winmasttdev/aegis-sentinel-ai" target="_blank" class="item">
-                    <i class="fa-solid fa-shield-halved"></i>
-                    <div class="info"><div class="title">aegis sentinel ai ⭐</div><div class="sub">autonomous room defense & AI security engine</div></div>
-                </a>
-                <a href="novahouse/index.html" class="item">
-                    <i class="fa-solid fa-house-signal"></i>
-                    <div class="info"><div class="title">novahouse</div><div class="sub">telegram smart home bot</div></div>
-                </a>
-                <a href="https://winmasttdev.github.io/windOS-Assist-Web/" target="_blank" class="item">
-                    <i class="fa-solid fa-robot"></i>
-                    <div class="info"><div class="title">windOS Assist</div><div class="sub">remote orchestration & AI system assistant</div></div>
-                </a>
-                <a href="https://windos.nn1kk00.ru" target="_blank" class="item">
-                    <i class="fa-solid fa-cloud"></i>
-                    <div class="info"><div class="title">windos</div><div class="sub">cloud os project</div></div>
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Socials Window -->
-    <div class="window" id="socials" style="display:none;">
-        <div class="title-bar">
-            <div class="title-bar-text">socials</div>
-            <div class="title-bar-controls">
-                <button aria-label="Minimize"></button>
-                <button aria-label="Maximize"></button>
-                <button aria-label="Close" onclick="document.getElementById('socials').style.display='none';document.getElementById('profile').style.display='block'"></button>
-            </div>
-        </div>
-        <div class="window-body has-space">
-            <div class="socials-list">
-                <a href="https://www.youtube.com/@deviwooo" target="_blank" class="item">
-                    <i class="fa-brands fa-youtube"></i> youtube
-                </a>
-                <a href="https://www.twitch.tv/winmastt_" target="_blank" class="item">
-                    <i class="fa-brands fa-twitch"></i> twitch
-                </a>
-                <a href="https://t.me/deviwoo" class="item">
-                    <i class="fa-brands fa-telegram"></i> telegram
-                </a>
-                <a href="https://steamcommunity.com/profiles/76561199177999897/" target="_blank" class="item">
-                    <i class="fa-brands fa-steam"></i> steam
-                </a>
-                <div class="item" onclick="copyDiscord()">
-                    <i class="fa-brands fa-discord"></i> @winmastt
+            <div class="window-body has-space">
+                <div class="projects-list">
+                    <a href="https://github.com/winmasttdev/aegis-sentinel-ai" target="_blank" class="item">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <div class="info"><div class="title">aegis sentinel ai ⭐</div><div class="sub">autonomous room defense & AI security engine</div></div>
+                    </a>
+                    <a href="novahouse/index.html" class="item">
+                        <i class="fa-solid fa-house-signal"></i>
+                        <div class="info"><div class="title">novahouse</div><div class="sub">telegram smart home bot</div></div>
+                    </a>
+                    <a href="https://winmasttdev.github.io/windOS-Assist-Web/" target="_blank" class="item">
+                        <i class="fa-solid fa-robot"></i>
+                        <div class="info"><div class="title">windOS Assist</div><div class="sub">remote orchestration & AI system assistant</div></div>
+                    </a>
+                    <a href="https://windos.nn1kk00.ru" target="_blank" class="item">
+                        <i class="fa-solid fa-cloud"></i>
+                        <div class="info"><div class="title">windos</div><div class="sub">cloud os project</div></div>
+                    </a>
                 </div>
             </div>
         </div>
+
+        <!-- Main Profile Window (always centered) -->
+        <div class="window active window-main" id="window-main">
+            <div class="title-bar">
+                <div class="title-bar-text">deviwoo</div>
+                <div class="title-bar-controls">
+                    <button aria-label="Minimize"></button>
+                    <button aria-label="Maximize"></button>
+                    <button aria-label="Close"></button>
+                </div>
+            </div>
+            <div class="window-body has-space">
+                <div class="profile">
+                    <img src="./avatar.png" alt="deviwoo" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=d&background=5dade2&color=fff'">
+                    <div class="name">deviwoo</div>
+                    <div class="status"><span class="dot"></span> online</div>
+                    <p class="desc">
+                        windows / linux / android / AI dev.<br>
+                        building autonomous computer vision systems.<br>
+                        streamer on twitch, videos on youtube.
+                    </p>
+                    <div class="tags">
+                        <span class="tag">#ai-sentinel</span>
+                        <span class="tag">#computer-vision</span>
+                        <span class="tag">#linux</span>
+                        <span class="tag">#android</span>
+                        <span class="tag">#pytorch</span>
+                    </div>
+                    <div class="btn-row">
+                        <button onclick="toggleProjects()">my projects</button>
+                        <button onclick="toggleSocials()">socials</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Socials Window (slides out right) -->
+        <div class="window active window-side window-socials" id="window-socials">
+            <div class="title-bar">
+                <div class="title-bar-text">socials</div>
+                <div class="title-bar-controls">
+                    <button aria-label="Minimize"></button>
+                    <button aria-label="Maximize"></button>
+                    <button aria-label="Close" onclick="toggleSocials()"></button>
+                </div>
+            </div>
+            <div class="window-body has-space">
+                <div class="socials-list">
+                    <a href="https://www.youtube.com/@deviwooo" target="_blank" class="item">
+                        <i class="fa-brands fa-youtube"></i> youtube
+                    </a>
+                    <a href="https://www.twitch.tv/winmastt_" target="_blank" class="item">
+                        <i class="fa-brands fa-twitch"></i> twitch
+                    </a>
+                    <a href="https://t.me/deviwoo" class="item">
+                        <i class="fa-brands fa-telegram"></i> telegram
+                    </a>
+                    <a href="https://steamcommunity.com/profiles/76561199177999897/" target="_blank" class="item">
+                        <i class="fa-brands fa-steam"></i> steam
+                    </a>
+                    <div class="item" onclick="copyDiscord()">
+                        <i class="fa-brands fa-discord"></i> @winmastt
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <div class="toast" id="toast">copied to clipboard ✓</div>
@@ -267,6 +343,37 @@
                 t.classList.add('show');
                 setTimeout(() => t.classList.remove('show'), 2000);
             });
+        }
+
+        let projectsOpen = false;
+        let socialsOpen = false;
+
+        function toggleProjects() {
+            projectsOpen = !projectsOpen;
+            const win = document.getElementById('window-projects');
+            const main = document.getElementById('window-main');
+
+            if (projectsOpen) {
+                win.classList.add('open');
+                if (!socialsOpen) main.classList.add('shift-left');
+            } else {
+                win.classList.remove('open');
+                if (!socialsOpen) main.classList.remove('shift-left');
+            }
+        }
+
+        function toggleSocials() {
+            socialsOpen = !socialsOpen;
+            const win = document.getElementById('window-socials');
+            const main = document.getElementById('window-main');
+
+            if (socialsOpen) {
+                win.classList.add('open');
+                if (!projectsOpen) main.classList.add('shift-right');
+            } else {
+                win.classList.remove('open');
+                if (!projectsOpen) main.classList.remove('shift-right');
+            }
         }
 
         // Konami code easter egg
