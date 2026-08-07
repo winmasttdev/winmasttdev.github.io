@@ -4,475 +4,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>deviwoo</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&family=Trebuchet+MS:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/7.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --aero-blue: #4a90d9;
-            --aero-blue-light: #7cb9f8;
-            --aero-green: #5cb85c;
-            --aero-green-light: #8fd98f;
-            --glass-tint: rgba(255, 255, 255, 0.25);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
         html, body {
+            margin: 0;
+            padding: 0;
             width: 100%;
             height: 100%;
             overflow: hidden;
-            font-family: 'Segoe UI', 'Trebuchet MS', sans-serif;
         }
 
-        /* ===== FRUTIGER AERO DESKTOP ===== */
+        /* Frutiger Aero desktop wallpaper */
+        body {
+            background:
+                radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.3) 0%, transparent 60%),
+                linear-gradient(180deg,
+                    #4a90d9 0%,
+                    #6db3f2 20%,
+                    #8ecfff 35%,
+                    #b8e6a8 60%,
+                    #7dcf67 80%,
+                    #4fb345 100%
+                );
+        }
+
+        /* Desktop area */
         .desktop {
             width: 100%;
-            height: 100%;
+            height: calc(100% - 40px);
             position: relative;
-            background:
-                /* Light rays */
-                radial-gradient(ellipse at 20% 0%, rgba(255,255,255,0.4) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 10%, rgba(255,255,255,0.2) 0%, transparent 40%),
-                /* Main sky gradient */
-                linear-gradient(180deg,
-                    #5dade2 0%,
-                    #85c1e9 15%,
-                    #aed6f1 30%,
-                    #d4efdf 55%',
-                    #abebc6 70%,
-                    #82e0aa 82%,
-                    #58d68d 92%,
-                    #2ecc71 100%
-                );
-            overflow: hidden;
         }
 
-        /* Bokeh / bubble layer */
-        .desktop::before {
-            content: '';
+        /* Windows */
+        .window {
             position: absolute;
-            inset: 0;
-            background:
-                radial-gradient(circle at 15% 20%, rgba(255,255,255,0.15) 0%, transparent 8%),
-                radial-gradient(circle at 85% 15%, rgba(255,255,255,0.12) 0%, transparent 6%),
-                radial-gradient(circle at 45% 35%, rgba(255,255,255,0.08) 0%, transparent 10%),
-                radial-gradient(circle at 70% 50%, rgba(255,255,255,0.1) 0%, transparent 7%),
-                radial-gradient(circle at 25% 60%, rgba(255,255,255,0.06) 0%, transparent 12%),
-                radial-gradient(circle at 90% 70%, rgba(255,255,255,0.1) 0%, transparent 5%);
-            pointer-events: none;
         }
 
-        /* Water reflection at bottom */
-        .desktop::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 25%;
-            background: linear-gradient(180deg,
-                transparent 0%,
-                rgba(125, 200, 255, 0.1) 30%,
-                rgba(80, 200, 120, 0.15) 100%
-            );
-            pointer-events: none;
+        .window-profile {
+            width: 350px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
-        /* Floating bubbles */
-        .bubble {
-            position: absolute;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%,
-                rgba(255,255,255,0.7) 0%,
-                rgba(255,255,255,0.2) 50%,
-                rgba(255,255,255,0.05) 100%
-            );
-            border: 1px solid rgba(255,255,255,0.4);
-            animation: float-up linear infinite;
-            pointer-events: none;
-        }
-
-        @keyframes float-up {
-            0% { transform: translateY(0) scale(1); opacity: 0.7; }
-            50% { opacity: 0.9; }
-            100% { transform: translateY(-100vh) scale(0.5); opacity: 0; }
-        }
-
-        /* ===== DESKTOP ICONS ===== */
+        /* Desktop icons */
         .desktop-icons {
             position: absolute;
             top: 20px;
             left: 20px;
-            z-index: 5;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .desktop-icon {
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 75px;
+            width: 70px;
             padding: 8px 4px;
-            border-radius: 4px;
+            border-radius: 3px;
             cursor: pointer;
             text-align: center;
-            transition: background 0.15s;
         }
 
         .desktop-icon:hover {
-            background: rgba(100, 180, 255, 0.3);
+            background: rgba(100, 180, 255, 0.35);
         }
 
-        .desktop-icon-icon {
-            font-size: 2.2rem;
+        .desktop-icon i {
+            font-size: 2rem;
             color: #fff;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
             margin-bottom: 4px;
         }
 
-        .desktop-icon-label {
+        .desktop-icon span {
             color: #fff;
-            font-size: 0.7rem;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            font-size: 0.65rem;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9);
             line-height: 1.2;
         }
 
-        /* ===== WINDOW OVERRIDES FOR AERO GLASS ===== */
-        .window {
-            border-radius: 8px 8px 0 0;
-            box-shadow:
-                0 0 0 1px rgba(0,0,0,0.3),
-                0 8px 32px rgba(0,0,0,0.3),
-                0 2px 8px rgba(0,0,0,0.2),
-                inset 0 1px 0 rgba(255,255,255,0.4);
-            backdrop-filter: none;
-        }
-
-        .window.active {
-            box-shadow:
-                0 0 0 1px rgba(0,0,0,0.4),
-                0 12px 48px rgba(0,0,0,0.4),
-                0 4px 12px rgba(0,0,0,0.3),
-                inset 0 1px 0 rgba(255,255,255,0.5);
-        }
-
-        /* Aero glass title bar */
-        .title-bar {
-            background: linear-gradient(180deg,
-                rgba(255,255,255,0.5) 0%,
-                rgba(200,225,255,0.4) 50%,
-                rgba(160,200,240,0.3) 100%
-            ) !important;
-            border-bottom: 1px solid rgba(0,0,0,0.15);
-            border-radius: 8px 8px 0 0;
-        }
-
-        .title-bar-text {
-            color: #1a1a2e !important;
-            font-weight: 600;
-            text-shadow: 0 1px 0 rgba(255,255,255,0.6);
-        }
-
-        /* Title bar buttons */
-        .title-bar-controls button {
-            background: linear-gradient(180deg,
-                rgba(255,255,255,0.5) 0%,
-                rgba(200,210,230,0.4) 100%
-            ) !important;
-            border: 1px solid rgba(0,0,0,0.2) !important;
-            border-radius: 3px;
-        }
-
-        .title-bar-controls button:hover {
-            background: linear-gradient(180deg,
-                rgba(255,255,255,0.7) 0%,
-                rgba(220,230,250,0.5) 100%
-            ) !important;
-        }
-
-        .title-bar-controls button[aria-label="Close"] {
-            background: linear-gradient(180deg,
-                #e8886a 0%,
-                #c7503e 100%
-            ) !important;
-            border-color: rgba(120,30,10,0.5) !important;
-        }
-
-        .title-bar-controls button[aria-label="Close"]:hover {
-            background: linear-gradient(180deg,
-                #f09070 0%,
-                #d04838 100%
-            ) !important;
-        }
-
-        /* Window body glass */
-        .window-body {
-            background: rgba(255,255,255,0.15) !important;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-
-        .window-body.has-space {
-            padding: 1.5rem;
-        }
-
-        /* ===== WINDOWS LAYOUT ===== */
-        .window-profile {
-            width: 380px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10;
-        }
-
-        .window-projects {
-            width: 440px;
-            position: absolute;
-            top: 8%;
-            left: 8%;
-            z-index: 11;
-            display: none;
-        }
-
-        .window-socials {
-            width: 360px;
-            position: absolute;
-            top: 12%;
-            right: 6%;
-            z-index: 12;
-            display: none;
-        }
-
-        /* ===== PROFILE CONTENT ===== */
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 1rem;
-        }
-
-        .avatar-aero {
-            width: 64px;
-            height: 64px;
-            border-radius: 6px;
-            border: 2px solid rgba(255,255,255,0.7);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            object-fit: cover;
-        }
-
-        .profile-name {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #1a1a2e;
-            text-shadow: 0 1px 0 rgba(255,255,255,0.5);
-        }
-
-        .profile-status {
-            font-size: 0.75rem;
-            color: #5a7a5a;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .profile-status .dot {
-            width: 8px;
-            height: 8px;
-            background: #22c55e;
-            border-radius: 50%;
-            box-shadow: 0 0 6px rgba(34,197,94,0.6);
-        }
-
-        .profile-desc {
-            font-size: 0.82rem;
-            color: #2c3e50;
-            line-height: 1.6;
-            margin-bottom: 1rem;
-        }
-
-        .tags-aero {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 1rem;
-        }
-
-        .tag-aero {
-            font-size: 0.68rem;
-            padding: 3px 10px;
-            border-radius: 12px;
-            background: linear-gradient(180deg,
-                rgba(255,255,255,0.6) 0%,
-                rgba(200,230,255,0.4) 100%
-            );
-            border: 1px solid rgba(100,150,200,0.3);
-            color: #2c3e50;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .tag-aero:hover {
-            background: linear-gradient(180deg,
-                rgba(255,255,255,0.8) 0%,
-                rgba(180,220,255,0.6) 100%
-            );
-            border-color: rgba(80,130,200,0.5);
-            transform: translateY(-1px);
-        }
-
-        /* Aero buttons */
-        .btn-aero {
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 0.8rem;
-            padding: 8px 20px;
-            border-radius: 4px;
-            border: 1px solid rgba(0,0,0,0.2);
-            background: linear-gradient(180deg,
-                rgba(255,255,255,0.7) 0%,
-                rgba(210,225,245,0.5) 100%
-            );
-            color: #1a1a2e;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.15s;
-            text-shadow: 0 1px 0 rgba(255,255,255,0.4);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-
-        .btn-aero:hover {
-            background: linear-gradient(180deg,
-                rgba(255,255,255,0.9) 0%,
-                rgba(200,230,255,0.7) 100%
-            );
-            border-color: rgba(80,130,200,0.5);
-            box-shadow: 0 2px 6px rgba(50,100,180,0.2);
-        }
-
-        .btn-aero:active {
-            background: linear-gradient(180deg,
-                rgba(180,210,240,0.6) 0%,
-                rgba(200,225,250,0.5) 100%
-            );
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-        }
-
-        .btn-aero.primary {
-            background: linear-gradient(180deg,
-                rgba(140,210,255,0.7) 0%,
-                rgba(80,160,230,0.6) 100%
-            );
-            border-color: rgba(40,100,180,0.4);
-            color: #fff;
-            text-shadow: 0 1px 2px rgba(0,40,80,0.3);
-        }
-
-        .btn-aero.primary:hover {
-            background: linear-gradient(180deg,
-                rgba(160,220,255,0.8) 0%,
-                rgba(100,175,240,0.7) 100%
-            );
-        }
-
-        .btn-row-aero {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        /* ===== PROJECTS LIST ===== */
-        .project-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.15s;
-            margin-bottom: 8px;
-            border: 1px solid transparent;
-        }
-
-        .project-item:hover {
-            background: linear-gradient(180deg,
-                rgba(255,255,255,0.4) 0%,
-                rgba(200,230,255,0.3) 100%
-            );
-            border-color: rgba(100,150,200,0.3);
-        }
-
-        .project-item-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 6px;
-            background: linear-gradient(135deg, rgba(100,180,255,0.5), rgba(80,200,120,0.4));
-            border: 1px solid rgba(255,255,255,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            color: #fff;
-            flex-shrink: 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .project-item-info { flex: 1; }
-
-        .project-item-name {
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: #1a1a2e;
-        }
-
-        .project-item-desc {
-            font-size: 0.72rem;
-            color: #5a6a7a;
-            margin-top: 2px;
-        }
-
-        /* ===== SOCIAL BUTTONS ===== */
-        .social-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.15s;
-            margin-bottom: 6px;
-            border: 1px solid transparent;
-            font-size: 0.82rem;
-            color: #1a1a2e;
-            font-weight: 600;
-        }
-
-        .social-item i { font-size: 16px; width: 20px; text-align: center; }
-
-        .social-item:hover {
-            background: linear-gradient(180deg,
-                rgba(255,255,255,0.4) 0%,
-                rgba(200,230,255,0.3) 100%
-            );
-            border-color: rgba(100,150,200,0.3);
-        }
-
-        .fa-youtube { color: #c4302b; }
-        .fa-twitch { color: #6441a5; }
-        .fa-telegram { color: #0088cc; }
-        .fa-steam { color: #1b2838; }
-        .fa-discord { color: #5865f2; }
-        .fa-github { color: #1a1a2e; }
-
-        /* ===== TASKBAR ===== */
+        /* Taskbar */
         .taskbar {
             position: fixed;
             bottom: 0;
@@ -480,365 +95,372 @@
             width: 100%;
             height: 40px;
             background: linear-gradient(180deg,
-                rgba(180,210,240,0.6) 0%,
-                rgba(120,160,210,0.7) 4%,
-                rgba(80,130,190,0.8) 8%,
-                rgba(60,110,170,0.85) 50%,
-                rgba(40,80,140,0.9) 100%
+                rgba(80,130,200,0.9) 0%,
+                rgba(50,90,160,0.95) 50%,
+                rgba(30,60,120,0.98) 100%
             );
-            border-top: 1px solid rgba(255,255,255,0.4);
-            backdrop-filter: blur(20px);
-            z-index: 100;
+            border-top: 1px solid rgba(255,255,255,0.3);
+            z-index: 1000;
             display: flex;
             align-items: center;
-            padding: 0 4px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
         }
 
         .start-btn {
-            width: 52px;
-            height: 32px;
+            width: 50px;
+            height: 30px;
+            margin-left: 4px;
             border-radius: 50%;
-            background: linear-gradient(135deg,
-                #5cb85c 0%,
-                #4cae4c 30%,
-                #398439 70%,
-                #2d672d 100%
-            );
+            background: linear-gradient(135deg, #5cb85c, #3d913d, #2d672d);
             border: 1px solid rgba(0,0,0,0.2);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            margin-right: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .start-btn::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3);
         }
 
         .start-btn i {
             color: #fff;
-            font-size: 16px;
+            font-size: 14px;
             filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
         }
 
         .taskbar-divider {
             width: 1px;
-            height: 28px;
+            height: 26px;
             background: rgba(255,255,255,0.2);
-            margin: 0 6px;
+            margin: 0 8px;
         }
 
-        .taskbar-windows {
+        .taskbar-items {
             flex: 1;
             display: flex;
+            align-items: center;
             gap: 4px;
             height: 100%;
-            align-items: center;
         }
 
         .taskbar-item {
-            height: 30px;
-            padding: 0 14px;
-            border-radius: 4px;
-            background: linear-gradient(180deg,
-                rgba(255,255,255,0.25) 0%,
-                rgba(200,220,245,0.2) 100%
-            );
-            border: 1px solid rgba(255,255,255,0.3);
+            height: 28px;
+            padding: 0 12px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
             display: flex;
             align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            font-size: 0.72rem;
+            gap: 6px;
             color: #fff;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-            transition: all 0.15s;
-            max-width: 180px;
+            font-size: 0.68rem;
+            cursor: pointer;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            max-width: 160px;
+            white-space: nowrap;
+            overflow: hidden;
         }
 
-        .taskbar-item:hover {
-            background: linear-gradient(180deg,
-                rgba(255,255,255,0.35) 0%,
-                rgba(220,235,255,0.3) 100%
-            );
+        .taskbar-item.active {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.4);
         }
 
-        .taskbar-item.active-tb {
-            background: linear-gradient(180deg,
-                rgba(255,255,255,0.4) 0%,
-                rgba(230,240,255,0.3) 100%
-            );
-            border-color: rgba(255,255,255,0.5);
-            box-shadow: inset 0 0 4px rgba(255,255,255,0.3);
-        }
-
-        .taskbar-item i { font-size: 12px; }
+        .taskbar-item i { font-size: 11px; }
 
         .system-tray {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             padding: 0 12px;
             height: 100%;
-            border-left: 1px solid rgba(255,255,255,0.2);
+            border-left: 1px solid rgba(255,255,255,0.15);
             margin-left: 4px;
         }
 
-        .tray-icon {
+        .system-tray i {
             color: #fff;
-            font-size: 13px;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            font-size: 12px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
         }
 
-        .tray-time {
+        .tray-clock {
             color: #fff;
-            font-size: 0.72rem;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            font-size: 0.68rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
             text-align: center;
-            line-height: 1.3;
+            line-height: 1.2;
         }
 
-        /* ===== START MENU ===== */
-        .start-menu {
-            position: fixed;
-            bottom: 40px;
-            left: 0;
-            width: 320px;
-            background: linear-gradient(180deg,
-                rgba(60,100,160,0.95) 0%,
-                rgba(40,70,130,0.98) 100%
-            );
-            border: 1px solid rgba(100,150,220,0.5);
-            border-bottom: none;
-            border-radius: 8px 8px 0 0;
-            backdrop-filter: blur(20px);
-            z-index: 99;
-            padding: 6px;
-            display: none;
-            box-shadow: 0 -8px 32px rgba(0,0,0,0.4);
-        }
-
-        .start-menu.show { display: block; }
-
-        .start-menu-header {
+        /* Profile content */
+        .profile-content {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 10px;
-            padding: 10px 12px;
-            background: linear-gradient(180deg,
-                rgba(255,255,255,0.2) 0%,
-                rgba(255,255,255,0.05) 100%
-            );
-            border-radius: 6px;
-            margin-bottom: 6px;
+            text-align: center;
         }
 
-        .start-menu-avatar {
-            width: 42px;
-            height: 42px;
+        .avatar {
+            width: 80px;
+            height: 80px;
             border-radius: 4px;
-            border: 2px solid rgba(255,255,255,0.6);
+            border: 3px solid #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             object-fit: cover;
+            margin-bottom: 12px;
         }
 
-        .start-menu-username {
-            color: #fff;
-            font-weight: 600;
-            font-size: 0.85rem;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        .profile-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
         }
 
-        .start-menu-item {
+        .profile-status {
+            font-size: 0.72rem;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 12px;
+        }
+
+        .profile-status .dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+        }
+
+        .profile-desc {
+            font-size: 0.78rem;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 14px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .tag {
+            font-size: 0.65rem;
+            padding: 3px 10px;
+            background: #e8f0fe;
+            border: 1px solid #c4d8f5;
+            border-radius: 12px;
+            color: #3d6da3;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Projects list */
+        .project-item {
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 8px 14px;
-            color: #fff;
-            font-size: 0.8rem;
+            padding: 8px 10px;
+            text-decoration: none;
+            color: #333;
+            border-radius: 3px;
+            margin-bottom: 4px;
+            transition: background 0.15s;
+        }
+
+        .project-item:hover {
+            background: #e8f0fe;
+        }
+
+        .project-item i {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #e8f0fe;
             border-radius: 4px;
+            font-size: 12px;
+            color: #4a7ab0;
+            border: 1px solid #c4d8f5;
+        }
+
+        .project-info { flex: 1; }
+
+        .project-name {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .project-desc {
+            font-size: 0.68rem;
+            color: #777;
+        }
+
+        /* Socials */
+        .social-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #333;
+            font-size: 0.78rem;
+            border-radius: 3px;
+            margin-bottom: 4px;
             cursor: pointer;
             transition: background 0.15s;
-            text-decoration: none;
         }
 
-        .start-menu-item:hover {
-            background: rgba(255,255,255,0.15);
+        .social-item:hover {
+            background: #e8f0fe;
         }
 
-        .start-menu-item i {
+        .social-item i {
             font-size: 14px;
             width: 20px;
             text-align: center;
         }
 
-        .start-menu-divider {
-            height: 1px;
-            background: rgba(255,255,255,0.15);
-            margin: 4px 8px;
-        }
+        .fa-youtube { color: #c4302b; }
+        .fa-twitch { color: #6441a5; }
+        .fa-telegram { color: #0088cc; }
+        .fa-steam { color: #1b2838; }
+        .fa-discord { color: #5865f2; }
 
-        /* ===== EGG TOAST ===== */
-        #egg-toast {
+        /* Toast */
+        .toast {
             position: fixed;
-            top: 60px;
+            bottom: 50px;
             left: 50%;
-            transform: translate(-50%, -120px);
-            background: linear-gradient(180deg, #5cb85c, #398439);
+            transform: translate(-50%, 20px);
+            background: #333;
             color: #fff;
-            padding: 10px 28px;
+            padding: 8px 20px;
             border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.82rem;
-            z-index: 200;
-            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            border: 1px solid rgba(255,255,255,0.3);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            font-size: 0.75rem;
+            opacity: 0;
+            transition: all 0.3s;
+            pointer-events: none;
+            z-index: 2000;
         }
 
-        #egg-toast.show { transform: translate(-50%, 0); }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 700px) {
-            .window-profile { width: 90% !important; }
-            .window-projects { width: 90% !important; left: 5% !important; }
-            .window-socials { width: 90% !important; right: 5% !important; }
-            .desktop-icons { display: none; }
+        .toast.show {
+            opacity: 1;
+            transform: translate(-50%, 0);
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== DESKTOP ===== -->
-    <div class="desktop" id="desktop">
-        <!-- Floating bubbles -->
-        <div class="bubble" style="width:30px;height:30px;top:80%;left:10%;animation-duration:14s;animation-delay:0s;"></div>
-        <div class="bubble" style="width:20px;height:20px;top:85%;left:30%;animation-duration:18s;animation-delay:2s;"></div>
-        <div class="bubble" style="width:40px;height:40px;top:90%;left:60%;animation-duration:12s;animation-delay:4s;"></div>
-        <div class="bubble" style="width:25px;height:25px;top:82%;left:80%;animation-duration:16s;animation-delay:1s;"></div>
-        <div class="bubble" style="width:15px;height:15px;top:88%;left:45%;animation-duration:20s;animation-delay:6s;"></div>
+    <div class="desktop">
 
         <!-- Desktop Icons -->
         <div class="desktop-icons">
-            <div class="desktop-icon" onclick="showWindow('profile')">
-                <div class="desktop-icon-icon"><i class="fa-solid fa-user"></i></div>
-                <div class="desktop-icon-label">About Me</div>
+            <div class="desktop-icon" onclick="document.getElementById('window-profile').style.display='block'">
+                <i class="fa-solid fa-user"></i>
+                <span>About Me</span>
             </div>
-            <div class="desktop-icon" onclick="showWindow('projects')">
-                <div class="desktop-icon-icon"><i class="fa-solid fa-code"></i></div>
-                <div class="desktop-icon-label">Projects</div>
+            <div class="desktop-icon" onclick="document.getElementById('window-projects').style.display='block'">
+                <i class="fa-solid fa-code"></i>
+                <span>Projects</span>
             </div>
-            <div class="desktop-icon" onclick="showWindow('socials')">
-                <div class="desktop-icon-icon"><i class="fa-solid fa-share-nodes"></i></div>
-                <div class="desktop-icon-label">Socials</div>
-            </div>
-            <div class="desktop-icon" onclick="showStartMenu()">
-                <div class="desktop-icon-icon" style="color:#5cb85c"><i class="fa-solid fa-power-off"></i></div>
-                <div class="desktop-icon-label">Start</div>
+            <div class="desktop-icon" onclick="document.getElementById('window-socials').style.display='block'">
+                <i class="fa-solid fa-share-nodes"></i>
+                <span>Socials</span>
             </div>
         </div>
 
-        <!-- ===== WINDOW: PROFILE ===== -->
+        <!-- Profile Window -->
         <div class="window window-profile active" id="window-profile">
             <div class="title-bar">
-                <div class="title-bar-text"><i class="fa-solid fa-user"></i> deviwoo — About Me</div>
+                <div class="title-bar-text">deviwoo — About Me</div>
                 <div class="title-bar-controls">
-                    <button aria-label="Minimize" onclick="minimizeWindow('profile')"></button>
+                    <button aria-label="Minimize"></button>
                     <button aria-label="Maximize"></button>
-                    <button aria-label="Close" onclick="closeWindow('profile')"></button>
+                    <button aria-label="Close" onclick="document.getElementById('window-profile').style.display='none'"></button>
                 </div>
             </div>
             <div class="window-body has-space">
-                <div class="profile-header">
-                    <img src="./avatar.png" alt="deviwoo" class="avatar-aero" onerror="this.src='https://ui-avatars.com/api/?name=d&background=5dade2&color=fff'">
-                    <div>
-                        <div class="profile-name">deviwoo</div>
-                        <div class="profile-status"><span class="dot"></span> online</div>
+                <div class="profile-content">
+                    <img src="./avatar.png" alt="deviwoo" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=d&background=5dade2&color=fff'">
+                    <div class="profile-name">deviwoo</div>
+                    <div class="profile-status"><span class="dot"></span> online</div>
+                    <p class="profile-desc">
+                        windows / linux / android / AI dev.<br>
+                        building autonomous computer vision systems.<br>
+                        streamer on twitch, videos on youtube.
+                    </p>
+                    <div class="tags">
+                        <span class="tag">#ai-sentinel</span>
+                        <span class="tag">#computer-vision</span>
+                        <span class="tag">#linux</span>
+                        <span class="tag">#android</span>
+                        <span class="tag">#pytorch</span>
                     </div>
-                </div>
-                <p class="profile-desc">
-                    windows / linux / android / AI dev.<br>
-                    building autonomous computer vision systems.<br>
-                    streamer on twitch, videos on youtube.
-                </p>
-                <div class="tags-aero">
-                    <span class="tag-aero">#ai-sentinel</span>
-                    <span class="tag-aero">#computer-vision</span>
-                    <span class="tag-aero">#linux</span>
-                    <span class="tag-aero">#android</span>
-                    <span class="tag-aero">#pytorch</span>
-                </div>
-                <div class="btn-row-aero">
-                    <button class="btn-aero primary" onclick="showWindow('projects')">
-                        <i class="fa-solid fa-code"></i> my projects
-                    </button>
-                    <button class="btn-aero" onclick="showWindow('socials')">
-                        <i class="fa-solid fa-link"></i> socials
-                    </button>
+                    <div class="btn-row">
+                        <button onclick="document.getElementById('window-projects').style.display='block'">my projects</button>
+                        <button onclick="document.getElementById('window-socials').style.display='block'">socials</button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- ===== WINDOW: PROJECTS ===== -->
-        <div class="window window-projects" id="window-projects">
+        <!-- Projects Window -->
+        <div class="window window-projects" id="window-projects" style="display:none;width:380px;top:8%;left:8%;">
             <div class="title-bar">
-                <div class="title-bar-text"><i class="fa-solid fa-code"></i> deviwoo — Projects</div>
+                <div class="title-bar-text">deviwoo — Projects</div>
                 <div class="title-bar-controls">
-                    <button aria-label="Minimize" onclick="minimizeWindow('projects')"></button>
+                    <button aria-label="Minimize"></button>
                     <button aria-label="Maximize"></button>
-                    <button aria-label="Close" onclick="closeWindow('projects')"></button>
+                    <button aria-label="Close" onclick="document.getElementById('window-projects').style.display='none'"></button>
                 </div>
             </div>
             <div class="window-body has-space">
                 <a href="https://github.com/winmasttdev/aegis-sentinel-ai" target="_blank" class="project-item">
-                    <div class="project-item-icon"><i class="fa-solid fa-shield-halved"></i></div>
-                    <div class="project-item-info">
-                        <div class="project-item-name">aegis sentinel ai ⭐</div>
-                        <div class="project-item-desc">autonomous room defense & AI security engine</div>
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <div class="project-info">
+                        <div class="project-name">aegis sentinel ai ⭐</div>
+                        <div class="project-desc">autonomous room defense & AI security engine</div>
                     </div>
                 </a>
                 <a href="novahouse/index.html" class="project-item">
-                    <div class="project-item-icon"><i class="fa-solid fa-house-signal"></i></div>
-                    <div class="project-item-info">
-                        <div class="project-item-name">novahouse</div>
-                        <div class="project-item-desc">telegram smart home bot</div>
+                    <i class="fa-solid fa-house-signal"></i>
+                    <div class="project-info">
+                        <div class="project-name">novahouse</div>
+                        <div class="project-desc">telegram smart home bot</div>
                     </div>
                 </a>
                 <a href="https://winmasttdev.github.io/windOS-Assist-Web/" target="_blank" class="project-item">
-                    <div class="project-item-icon"><i class="fa-solid fa-robot"></i></div>
-                    <div class="project-item-info">
-                        <div class="project-item-name">windOS Assist</div>
-                        <div class="project-item-desc">remote orchestration & AI system assistant</div>
+                    <i class="fa-solid fa-robot"></i>
+                    <div class="project-info">
+                        <div class="project-name">windOS Assist</div>
+                        <div class="project-desc">remote orchestration & AI system assistant</div>
                     </div>
                 </a>
                 <a href="https://windos.nn1kk00.ru" target="_blank" class="project-item">
-                    <div class="project-item-icon"><i class="fa-solid fa-cloud"></i></div>
-                    <div class="project-item-info">
-                        <div class="project-item-name">windos</div>
-                        <div class="project-item-desc">cloud os project</div>
+                    <i class="fa-solid fa-cloud"></i>
+                    <div class="project-info">
+                        <div class="project-name">windos</div>
+                        <div class="project-desc">cloud os project</div>
                     </div>
                 </a>
             </div>
         </div>
 
-        <!-- ===== WINDOW: SOCIALS ===== -->
-        <div class="window window-socials" id="window-socials">
+        <!-- Socials Window -->
+        <div class="window window-socials" id="window-socials" style="display:none;width:320px;top:12%;right:6%;">
             <div class="title-bar">
-                <div class="title-bar-text"><i class="fa-solid fa-share-nodes"></i> deviwoo — Socials</div>
+                <div class="title-bar-text">deviwoo — Socials</div>
                 <div class="title-bar-controls">
-                    <button aria-label="Minimize" onclick="minimizeWindow('socials')"></button>
+                    <button aria-label="Minimize"></button>
                     <button aria-label="Maximize"></button>
-                    <button aria-label="Close" onclick="closeWindow('socials')"></button>
+                    <button aria-label="Close" onclick="document.getElementById('window-socials').style.display='none'"></button>
                 </div>
             </div>
             <div class="window-body has-space">
@@ -859,252 +481,70 @@
                 </div>
             </div>
         </div>
+
     </div>
 
-    <!-- ===== START MENU ===== -->
-    <div class="start-menu" id="start-menu">
-        <div class="start-menu-header">
-            <img src="./avatar.png" alt="deviwoo" class="start-menu-avatar" onerror="this.src='https://ui-avatars.com/api/?name=d&background=5dade2&color=fff'">
-            <span class="start-menu-username">deviwoo</span>
-        </div>
-        <div class="start-menu-divider"></div>
-        <a class="start-menu-item" onclick="showWindow('profile')">
-            <i class="fa-solid fa-user"></i> About Me
-        </a>
-        <a class="start-menu-item" onclick="showWindow('projects')">
-            <i class="fa-solid fa-code"></i> Projects
-        </a>
-        <a class="start-menu-item" onclick="showWindow('socials')">
-            <i class="fa-solid fa-share-nodes"></i> Socials
-        </a>
-        <div class="start-menu-divider"></div>
-        <a href="https://github.com/winmasttdev" target="_blank" class="start-menu-item">
-            <i class="fa-brands fa-github"></i> GitHub
-        </a>
-        <a href="https://t.me/deviwoo" class="start-menu-item">
-            <i class="fa-brands fa-telegram"></i> Contact
-        </a>
-    </div>
-
-    <!-- ===== TASKBAR ===== -->
+    <!-- Taskbar -->
     <div class="taskbar">
-        <div class="start-btn" onclick="toggleStartMenu()">
+        <div class="start-btn">
             <i class="fa-brands fa-windows"></i>
         </div>
         <div class="taskbar-divider"></div>
-        <div class="taskbar-windows" id="taskbar-windows">
-            <div class="taskbar-item active-tb" onclick="showWindow('profile')" id="tb-profile">
-                <i class="fa-solid fa-user"></i> About Me
-            </div>
-        </div>
+        <div class="taskbar-items" id="taskbar-items"></div>
         <div class="system-tray">
-            <i class="fa-solid fa-wifi tray-icon"></i>
-            <i class="fa-solid fa-volume-high tray-icon"></i>
-            <div class="tray-time" id="tray-time">12:00<br>08/08/2026</div>
+            <i class="fa-solid fa-wifi"></i>
+            <i class="fa-solid fa-volume-high"></i>
+            <div class="tray-clock" id="clock">12:00<br>08/08/2026</div>
         </div>
     </div>
 
-    <div id="egg-toast">🌿 easter egg unlocked! 🌿</div>
+    <div class="toast" id="toast">copied to clipboard ✓</div>
 
     <script>
-        // Window management
-        function showWindow(name) {
-            const win = document.getElementById('window-' + name);
-            if (!win) return;
-
-            // Hide all windows first
-            document.querySelectorAll('.window').forEach(w => {
-                w.style.display = 'none';
-                w.classList.remove('active');
-            });
-
-            // Show target window
-            win.style.display = 'block';
-            win.classList.add('active');
-            win.style.zIndex = 50;
-
-            // Update taskbar
-            updateTaskbar(name);
-            hideStartMenu();
-        }
-
-        function minimizeWindow(name) {
-            const win = document.getElementById('window-' + name);
-            if (win) {
-                win.style.display = 'none';
-                win.classList.remove('active');
-            }
-        }
-
-        function closeWindow(name) {
-            minimizeWindow(name);
-        }
-
-        function updateTaskbar(active) {
-            const tb = document.getElementById('taskbar-windows');
-            tb.innerHTML = '';
-
-            const windows = [
-                { id: 'profile', icon: 'fa-user', label: 'About Me' },
-                { id: 'projects', icon: 'fa-code', label: 'Projects' },
-                { id: 'socials', icon: 'fa-share-nodes', label: 'Socials' },
-            ];
-
-            windows.forEach(w => {
-                const win = document.getElementById('window-' + w.id);
-                if (win && win.style.display !== 'none') {
-                    const item = document.createElement('div');
-                    item.className = 'taskbar-item' + (w.id === active ? ' active-tb' : '');
-                    item.innerHTML = `<i class="fa-solid ${w.icon}"></i> ${w.label}`;
-                    item.onclick = () => showWindow(w.id);
-                    tb.appendChild(item);
-                }
-            });
-        }
-
-        // Start menu
-        function toggleStartMenu() {
-            const menu = document.getElementById('start-menu');
-            menu.classList.toggle('show');
-        }
-
-        function hideStartMenu() {
-            document.getElementById('start-menu').classList.remove('show');
-        }
-
-        // Click outside to close start menu
-        document.getElementById('desktop').addEventListener('click', (e) => {
-            if (!e.target.closest('.start-menu') && !e.target.closest('.start-btn')) {
-                hideStartMenu();
-            }
-        });
-
-        // Copy discord
         function copyDiscord() {
             navigator.clipboard.writeText("winmastt").then(() => {
-                const toast = document.getElementById("egg-toast");
-                toast.textContent = "copied to clipboard ✓";
-                toast.classList.add("show");
-                setTimeout(() => {
-                    toast.classList.remove("show");
-                    toast.textContent = "🌿 easter egg unlocked! 🌿";
-                }, 2500);
+                const t = document.getElementById('toast');
+                t.classList.add('show');
+                setTimeout(() => t.classList.remove('show'), 2000);
             });
         }
-
-        // ===== EASTER EGG: KONAMI CODE =====
-        const konami = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
-        let konamiIndex = 0;
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === konami[konamiIndex]) {
-                konamiIndex++;
-                if (konamiIndex === konami.length) {
-                    triggerEasterEgg();
-                    konamiIndex = 0;
-                }
-            } else {
-                konamiIndex = 0;
-            }
-        });
-
-        function triggerEasterEgg() {
-            const eggToast = document.getElementById("egg-toast");
-            eggToast.textContent = "🌿 konami code activated! 🌿";
-            eggToast.classList.add("show");
-            setTimeout(() => {
-                eggToast.classList.remove("show");
-                eggToast.textContent = "🌿 easter egg unlocked! 🌿";
-            }, 3000);
-
-            // Bubble rain
-            const colors = ['rgba(100,200,255,0.6)', 'rgba(150,255,150,0.5)', 'rgba(255,255,255,0.7)', 'rgba(200,150,255,0.4)'];
-            for (let i = 0; i < 30; i++) {
-                setTimeout(() => {
-                    const bubble = document.createElement('div');
-                    bubble.className = 'bubble';
-                    bubble.style.width = (Math.random() * 40 + 15) + 'px';
-                    bubble.style.height = bubble.style.width;
-                    bubble.style.left = Math.random() * 100 + '%';
-                    bubble.style.top = '85%';
-                    bubble.style.animationDuration = (Math.random() * 3 + 3) + 's';
-                    document.querySelector('.desktop').appendChild(bubble);
-                    setTimeout(() => bubble.remove(), 6000);
-                }, i * 80);
-            }
-
-            // Desktop disco
-            let hue = 200;
-            const disco = setInterval(() => {
-                hue = (hue + 2) % 360;
-                document.querySelector('.desktop').style.background = `linear-gradient(180deg,
-                    hsl(${hue}, 60%, 70%) 0%,
-                    hsl(${(hue + 30) % 360}, 50%, 60%) 50%,
-                    hsl(${(hue + 60) % 360}, 55%, 55%) 100%
-                )`;
-            }, 80);
-
-            setTimeout(() => {
-                clearInterval(disco);
-                document.querySelector('.desktop').style.background = '';
-            }, 5000);
-        }
-
-        // Avatar click combo
-        let avatarClicks = 0;
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('avatar-aero') || e.target.classList.contains('start-menu-avatar')) {
-                avatarClicks++;
-                if (avatarClicks >= 5) {
-                    triggerEasterEgg();
-                    document.getElementById("egg-toast").textContent = "🎉 avatar combo! 🎉";
-                    setTimeout(() => {
-                        document.getElementById("egg-toast").textContent = "🌿 easter egg unlocked! 🌿";
-                    }, 3000);
-                    avatarClicks = 0;
-                }
-            }
-        });
 
         // Clock
-        function updateClock() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const year = now.getFullYear();
-            document.getElementById('tray-time').innerHTML =
-                `${hours}:${minutes}<br>${day}/${month}/${year}`;
+        function tick() {
+            const d = new Date();
+            document.getElementById('clock').innerHTML =
+                String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0') +
+                '<br>' + String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
         }
-        setInterval(updateClock, 1000);
-        updateClock();
+        setInterval(tick, 1000);
+        tick();
 
         // Make windows draggable
-        document.querySelectorAll('.title-bar').forEach(titleBar => {
-            const windowEl = titleBar.closest('.window');
-            let isDragging = false;
-            let offsetX, offsetY;
-
-            titleBar.addEventListener('mousedown', (e) => {
-                if (e.target.closest('.title-bar-controls')) return;
-                isDragging = true;
-                offsetX = e.clientX - windowEl.getBoundingClientRect().left;
-                offsetY = e.clientY - windowEl.getBoundingClientRect().top;
-                windowEl.style.zIndex = 100;
+        document.querySelectorAll('.title-bar').forEach(tb => {
+            const win = tb.closest('.window');
+            let drag = false, ox, oy;
+            tb.addEventListener('mousedown', e => {
+                if (e.target.closest('button')) return;
+                drag = true;
+                ox = e.clientX - win.getBoundingClientRect().left;
+                oy = e.clientY - win.getBoundingClientRect().top;
+                win.style.position = 'fixed';
             });
-
-            document.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
-                windowEl.style.left = (e.clientX - offsetX) + 'px';
-                windowEl.style.top = (e.clientY - offsetY) + 'px';
-                windowEl.style.transform = 'none';
-                windowEl.style.position = 'fixed';
+            document.addEventListener('mousemove', e => {
+                if (!drag) return;
+                win.style.left = (e.clientX - ox) + 'px';
+                win.style.top = (e.clientY - oy) + 'px';
+                win.style.transform = 'none';
             });
+            document.addEventListener('mouseup', () => drag = false);
+        });
 
-            document.addEventListener('mouseup', () => {
-                isDragging = false;
-            });
+        // Easter egg
+        const code = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+        let idx = 0;
+        document.addEventListener('keydown', e => {
+            idx = e.key === code[idx] ? idx + 1 : 0;
+            if (idx === code.length) { idx = 0; alert('🌿 Easter egg! Konami code activated! 🌿'); }
         });
     </script>
 </body>
