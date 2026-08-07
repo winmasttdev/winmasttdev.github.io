@@ -2,386 +2,551 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>deviwoo</title>
-    <link rel="stylesheet" href="https://unpkg.com/7.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        html, body {
+        :root {
+            --rx: 0deg;
+            --ry: 0deg;
+            --bg-x: 50%;
+            --bg-y: 50%;
+        }
+
+        * {
             margin: 0;
             padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
 
         body {
-            background: linear-gradient(180deg,
-                #4a90d9 0%,
-                #6db3f2 20%,
-                #8ecfff 35%,
-                #b8e6a8 60%,
-                #7dcf67 80%,
-                #4fb345 100%
-            );
+            background-color: #050505;
+            background-image: radial-gradient(circle at var(--bg-x) var(--bg-y), rgba(255, 255, 255, 0.05) 0%, transparent 40%), 
+                              url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            width: 100vw;
+            height: 100dvh;
+            overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            overscroll-behavior: none;
             display: flex;
             justify-content: center;
             align-items: center;
+            perspective: 1000px;
         }
 
-        /* Window container - all windows relative to center */
-        .windows-container {
+        .scene {
             position: relative;
-            width: 100%;
+            width: 90%;
+            max-width: 420px;
             height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        .window {
+        .card {
             position: absolute;
-        }
-
-        /* Main window always centered */
-        .window-main {
-            z-index: 10;
-        }
-
-        /* Side windows slide out from center */
-        .window-side {
-            z-index: 5;
-            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease, filter 0.4s ease;
-        }
-
-        .window-projects {
-            transform: translateX(calc(-100% - 30px%));
-            opacity: 0;
-            filter: blur(8px);
-            pointer-events: none;
-        }
-
-        .window-projects.open {
-            transform: translateX(calc(-100% - 30px));
-            opacity: 1;
-            filter: blur(0);
-            pointer-events: all;
-        }
-
-        .window-socials {
-            transform: translateX(calc(100% + 30px));
-            opacity: 0;
-            filter: blur(8px);
-            pointer-events: none;
-        }
-
-        .window-socials.open {
-            transform: translateX(calc(100% + 30px));
-            opacity: 1;
-            filter: blur(0);
-            pointer-events: all;
-        }
-
-        /* When only one side is open, we can adjust spacing */
-        .window-main {
-            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-
-        .window-main.shift-left {
-            transform: translateX(-180px);
-        }
-
-        .window-main.shift-right {
-            transform: translateX(180px);
-        }
-
-        /* Profile content */
-        .profile {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotateX(var(--rx)) rotateY(var(--ry)) scale(0.95);
+            background: rgba(15, 15, 15, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
+            padding: 2.5rem 2rem;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
             text-align: center;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            z-index: 0;
+            transition: opacity 0.6s ease, visibility 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            will-change: transform, opacity;
         }
 
-        .avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 4px;
-            border: 3px solid #fff;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        .card.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: all;
+            z-index: 10;
+            transform: translate(-50%, -50%) rotateX(var(--rx)) rotateY(var(--ry)) scale(1);
+        }
+
+        .card.hidden-left { transform: translate(-120%, -50%) scale(0.85); opacity: 0; }
+        .card.hidden-right { transform: translate(20%, -50%) scale(0.85); opacity: 0; }
+
+        .avatar-container {
+            width: 104px;
+            height: 104px;
+            margin: 0 auto 1.4rem auto;
+            border-radius: 50%;
+            padding: 3px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.02));
+            position: relative;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
+        }
+
+        .avatar-container::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: spin 4s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .avatar-container img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
             object-fit: cover;
-            margin-bottom: 12px;
+            border: 4px solid #0a0a0a;
+            display: block;
+            background: #111;
         }
 
-        .name {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 4px;
+        .status-dot {
+            width: 14px;
+            height: 14px;
+            background: #22c55e;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            border: 3px solid #0a0a0a;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.8);
+            animation: pulse-dot 2.5s ease-in-out infinite;
         }
 
-        .status {
-            font-size: 0.72rem;
-            color: #666;
+        @keyframes pulse-dot {
+            0%, 100% { box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+            50% { box-shadow: 0 0 16px rgba(34,197,94,1); }
+        }
+
+        h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 0.4rem;
+            background: linear-gradient(to right, #ffffff, #888888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: lowercase;
+            min-height: 2.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
-            margin-bottom: 12px;
         }
 
-        .status .dot {
-            width: 8px;
-            height: 8px;
-            background: #22c55e;
-            border-radius: 50%;
+        h2 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            color: #fff;
+            text-transform: lowercase;
         }
 
-        .desc {
-            font-size: 0.78rem;
-            color: #555;
+        .subtitle {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 12px;
+            height: 4px;
+            background-color: #fff;
+            animation: blink 1s step-end infinite;
+            margin-left: 4px;
+            transform: translateY(6px);
+        }
+
+        p {
+            font-size: 0.95rem;
             line-height: 1.6;
-            margin-bottom: 14px;
+            color: #999;
+            margin-bottom: 1.8rem;
         }
 
         .tags {
             display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
             justify-content: center;
-            margin-bottom: 16px;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
         }
 
         .tag {
-            font-size: 0.65rem;
-            padding: 3px 10px;
-            background: #e8f0fe;
-            border: 1px solid #c4d8f5;
-            border-radius: 12px;
-            color: #3d6da3;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 6px 14px;
+            border-radius: 8px;
+            color: #aaa;
+            text-transform: lowercase;
+            transition: all 0.3s ease;
+        }
+
+        .tag:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
         }
 
         .btn-row {
             display: flex;
-            gap: 8px;
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
         }
 
-        .projects-list, .socials-list {
+        .btn-primary, .btn-ghost, .btn-back {
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: lowercase;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            padding: 14px 36px;
+            background: #fff;
+            color: #000;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border: none;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+            background: #f0f0f0;
+        }
+
+        .btn-primary:active { transform: translateY(1px); }
+
+        .btn-ghost {
+            padding: 12px 36px;
+            background: transparent;
+            color: #888;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn-ghost:hover {
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-back {
+            padding: 10px 24px;
+            background: transparent;
+            color: #666;
+            font-weight: 400;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255,255,255,0.05);
+            margin-top: 1.5rem;
+        }
+
+        .btn-back:hover {
+            color: #fff;
+            border-color: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .links-container, .projects-grid {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 12px;
+            width: 100%;
         }
 
-        .item {
+        .social-btn, .project-card {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 8px 10px;
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
             text-decoration: none;
-            color: #333;
-            border-radius: 3px;
-            font-size: 0.78rem;
+            transition: all 0.3s ease;
             cursor: pointer;
         }
 
-        .item:hover {
-            background: #e8f0fe;
+        .social-btn {
+            justify-content: center;
+            gap: 12px;
+            color: #aaa;
+            font-weight: 600;
+            font-size: 0.9rem;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: lowercase;
         }
 
-        .item i {
-            width: 28px;
-            height: 28px;
+        .social-btn i { font-size: 16px; }
+        .project-card { gap: 16px; }
+
+        .social-btn:hover, .project-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            transform: scale(1.02);
+        }
+
+        .project-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #e8f0fe;
-            border-radius: 4px;
-            font-size: 12px;
-            color: #4a7ab0;
-            border: 1px solid #c4d8f5;
-        }
-
-        .item .info { flex: 1; }
-        .item .info .title { font-weight: 600; }
-        .item .info .sub { font-size: 0.68rem; color: #777; }
-
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translate(-50%, 20px);
-            background: #333;
+            font-size: 18px;
+            flex-shrink: 0;
             color: #fff;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            opacity: 0;
-            transition: all 0.3s;
-            pointer-events: none;
         }
 
-        .toast.show { opacity: 1; transform: translate(-50%, 0); }
+        .project-info { text-align: left; flex: 1; }
 
-        @media (max-width: 900px) {
-            .window-projects, .window-projects.open {
-                transform: translateX(-50%) translateY(calc(-100% - 20px));
-            }
-            .window-socials, .window-socials.open {
-                transform: translateX(-50%) translateY(calc(100% + 20px));
-            }
+        .project-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #fff;
+            text-transform: lowercase;
+        }
+
+        .project-desc { font-size: 0.8rem; color: #777; margin-top: 4px; }
+
+        .project-arrow { color: #444; font-size: 14px; transition: 0.3s; }
+        .project-card:hover .project-arrow { color: #fff; transform: translateX(4px); }
+
+        #toast {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translate(-50%, 20px) scale(0.9);
+            background: rgba(255, 255, 255, 0.95);
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: bold;
+            font-size: 0.85rem;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+            z-index: 100;
+            text-transform: lowercase;
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+        }
+
+        #toast.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
+
+        @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+
+        @media (max-width: 480px) {
+            .card { padding: 2rem 1.5rem; }
+            h1 { font-size: 1.6rem; }
+            .project-card, .social-btn { padding: 12px; }
+            .btn-primary { padding: 12px 30px; }
+            .btn-ghost { padding: 10px 30px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="windows-container">
+    <div class="scene">
 
-        <!-- Projects Window (slides out left) -->
-        <div class="window active window-side window-projects" id="window-projects">
-            <div class="title-bar">
-                <div class="title-bar-text">projects</div>
-                <div class="title-bar-controls">
-                    <button aria-label="Minimize"></button>
-                    <button aria-label="Maximize"></button>
-                    <button aria-label="Close" onclick="toggleProjects()"></button>
-                </div>
+        <!-- PROFILE CARD -->
+        <div class="card active" id="profile-card">
+            <div class="avatar-container">
+                <img src="./avatar.png" alt="deviwoo">
+                <div class="status-dot"></div>
             </div>
-            <div class="window-body has-space">
-                <div class="projects-list">
-                    <a href="https://github.com/winmasttdev/aegis-sentinel-ai" target="_blank" class="item">
-                        <i class="fa-solid fa-shield-halved"></i>
-                        <div class="info"><div class="title">aegis sentinel ai ⭐</div><div class="sub">autonomous room defense & AI security engine</div></div>
-                    </a>
-                    <a href="novahouse/index.html" class="item">
-                        <i class="fa-solid fa-house-signal"></i>
-                        <div class="info"><div class="title">novahouse</div><div class="sub">telegram smart home bot</div></div>
-                    </a>
-                    <a href="https://winmasttdev.github.io/windOS-Assist-Web/" target="_blank" class="item">
-                        <i class="fa-solid fa-robot"></i>
-                        <div class="info"><div class="title">windOS Assist</div><div class="sub">remote orchestration & AI system assistant</div></div>
-                    </a>
-                    <a href="https://windos.nn1kk00.ru" target="_blank" class="item">
-                        <i class="fa-solid fa-cloud"></i>
-                        <div class="info"><div class="title">windos</div><div class="sub">cloud os project</div></div>
-                    </a>
-                </div>
+
+            <div class="subtitle">developer & ai specialist</div>
+            <h1><span id="typewriter"></span><span class="cursor"></span></h1>
+
+            <p>windows / linux / android / AI dev.<br>building autonomous computer vision systems.<br>streamer on twitch, videos on youtube.</p>
+
+            <div class="tags">
+                <span class="tag">#ai-sentinel</span>
+                <span class="tag">#computer-vision</span>
+                <span class="tag">#linux</span>
+                <span class="tag">#android</span>
+                <span class="tag">#pytorch</span>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn-primary" onclick="navigate('profile-card', 'projects-card', 'left')">my projects <i class="fa-solid fa-code"></i></button>
+                <button class="btn-ghost" onclick="navigate('profile-card', 'contact-card', 'right')">socials <i class="fa-solid fa-link"></i></button>
             </div>
         </div>
 
-        <!-- Main Profile Window (always centered) -->
-        <div class="window active window-main" id="window-main">
-            <div class="title-bar">
-                <div class="title-bar-text">deviwoo</div>
-                <div class="title-bar-controls">
-                    <button aria-label="Minimize"></button>
-                    <button aria-label="Maximize"></button>
-                    <button aria-label="Close"></button>
-                </div>
-            </div>
-            <div class="window-body has-space">
-                <div class="profile">
-                    <img src="./avatar.png" alt="deviwoo" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=d&background=5dade2&color=fff'">
-                    <div class="name">deviwoo</div>
-                    <div class="status"><span class="dot"></span> online</div>
-                    <p class="desc">
-                        windows / linux / android / AI dev.<br>
-                        building autonomous computer vision systems.<br>
-                        streamer on twitch, videos on youtube.
-                    </p>
-                    <div class="tags">
-                        <span class="tag">#ai-sentinel</span>
-                        <span class="tag">#computer-vision</span>
-                        <span class="tag">#linux</span>
-                        <span class="tag">#android</span>
-                        <span class="tag">#pytorch</span>
+        <!-- PROJECTS CARD -->
+        <div class="card hidden-right" id="projects-card">
+            <h2>projects</h2>
+
+            <div class="projects-grid">
+                <a href="https://github.com/winmasttdev/aegis-sentinel-ai" target="_blank" class="project-card" style="border-color: rgba(0, 240, 255, 0.4); background: rgba(0, 240, 255, 0.04);">
+                    <div class="project-icon" style="color: #00f0ff; border-color: rgba(0, 240, 255, 0.4);"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div class="project-info">
+                        <div class="project-name" style="color: #00f0ff;">aegis sentinel ai ⭐</div>
+                        <div class="project-desc">autonomous room defense & AI security engine (ByteTrack + InsightFace + Qwen3-VL)</div>
                     </div>
-                    <div class="btn-row">
-                        <button onclick="toggleProjects()">my projects</button>
-                        <button onclick="toggleSocials()">socials</button>
+                    <i class="fa-solid fa-arrow-up-right-from-square project-arrow" style="color: #00f0ff;"></i>
+                </a>
+
+                <a href="novahouse/index.html" class="project-card">
+                    <div class="project-icon"><i class="fa-solid fa-house-signal"></i></div>
+                    <div class="project-info">
+                        <div class="project-name">novahouse</div>
+                        <div class="project-desc">telegram smart home bot</div>
                     </div>
-                </div>
+                    <i class="fa-solid fa-arrow-right project-arrow"></i>
+                </a>
+
+                <a href="https://winmasttdev.github.io/windOS-Assist-Web/" target="_blank" class="project-card">
+                    <div class="project-icon"><i class="fa-solid fa-robot"></i></div>
+                    <div class="project-info">
+                        <div class="project-name">windOS Assist</div>
+                        <div class="project-desc">remote orchestration & AI system assistant</div>
+                    </div>
+                    <i class="fa-solid fa-arrow-up-right-from-square project-arrow"></i>
+                </a>
+
+                <a href="https://windos.nn1kk00.ru" target="_blank" class="project-card">
+                    <div class="project-icon"><i class="fa-solid fa-cloud"></i></div>
+                    <div class="project-info">
+                        <div class="project-name">windos</div>
+                        <div class="project-desc">cloud os project</div>
+                    </div>
+                    <i class="fa-solid fa-arrow-up-right-from-square project-arrow"></i>
+                </a>
             </div>
+
+            <button class="btn-back" onclick="navigate('projects-card', 'profile-card', 'right')"><i class="fa-solid fa-arrow-left"></i> back</button>
         </div>
 
-        <!-- Socials Window (slides out right) -->
-        <div class="window active window-side window-socials" id="window-socials">
-            <div class="title-bar">
-                <div class="title-bar-text">socials</div>
-                <div class="title-bar-controls">
-                    <button aria-label="Minimize"></button>
-                    <button aria-label="Maximize"></button>
-                    <button aria-label="Close" onclick="toggleSocials()"></button>
+        <!-- CONTACT CARD -->
+        <div class="card hidden-left" id="contact-card">
+            <h2>socials</h2>
+
+            <div class="links-container">
+                <a href="https://www.youtube.com/@deviwoo" target="_blank" class="social-btn">
+                    <i class="fa-brands fa-youtube"></i> youtube
+                </a>
+                <a href="https://www.twitch.tv/deviwoo" target="_blank" class="social-btn">
+                    <i class="fa-brands fa-twitch"></i> twitch
+                </a>
+                <a href="https://t.me/deviwoo" class="social-btn">
+                    <i class="fa-brands fa-telegram"></i> telegram
+                </a>
+                <a href="https://steamcommunity.com/profiles/76561199177999897/" target="_blank" class="social-btn">
+                    <i class="fa-brands fa-steam"></i> steam
+                </a>
+                <div class="social-btn" onclick="copyDiscord()">
+                    <i class="fa-brands fa-discord"></i> @deviwoo
                 </div>
             </div>
-            <div class="window-body has-space">
-                <div class="socials-list">
-                    <a href="https://www.youtube.com/@deviwooo" target="_blank" class="item">
-                        <i class="fa-brands fa-youtube"></i> youtube
-                    </a>
-                    <a href="https://www.twitch.tv/winmastt_" target="_blank" class="item">
-                        <i class="fa-brands fa-twitch"></i> twitch
-                    </a>
-                    <a href="https://t.me/deviwoo" class="item">
-                        <i class="fa-brands fa-telegram"></i> telegram
-                    </a>
-                    <a href="https://steamcommunity.com/profiles/76561199177999897/" target="_blank" class="item">
-                        <i class="fa-brands fa-steam"></i> steam
-                    </a>
-                    <div class="item" onclick="copyDiscord()">
-                        <i class="fa-brands fa-discord"></i> @winmastt
-                    </div>
-                </div>
-            </div>
+
+            <button class="btn-back" onclick="navigate('contact-card', 'profile-card', 'left')"><i class="fa-solid fa-arrow-left"></i> back</button>
         </div>
 
     </div>
 
-    <div class="toast" id="toast">copied to clipboard ✓</div>
+    <div id="toast">copied to clipboard ✓</div>
 
     <script>
-        function copyDiscord() {
-            navigator.clipboard.writeText("winmastt").then(() => {
-                const t = document.getElementById('toast');
-                t.classList.add('show');
-                setTimeout(() => t.classList.remove('show'), 2000);
-            });
-        }
-
-        let projectsOpen = false;
-        let socialsOpen = false;
-
-        function toggleProjects() {
-            projectsOpen = !projectsOpen;
-            const win = document.getElementById('window-projects');
-            const main = document.getElementById('window-main');
-
-            if (projectsOpen) {
-                win.classList.add('open');
-                if (!socialsOpen) main.classList.add('shift-left');
-            } else {
-                win.classList.remove('open');
-                if (!socialsOpen) main.classList.remove('shift-left');
+        document.addEventListener("DOMContentLoaded", () => {
+            const text = "deviwoo";
+            const el = document.getElementById("typewriter");
+            let i = 0;
+            
+            function type() {
+                if (i < text.length) {
+                    el.innerHTML += text.charAt(i++);
+                    setTimeout(type, 150);
+                }
             }
-        }
+            setTimeout(type, 300);
 
-        function toggleSocials() {
-            socialsOpen = !socialsOpen;
-            const win = document.getElementById('window-socials');
-            const main = document.getElementById('window-main');
+            window.navigate = (fromId, toId, direction) => {
+                const from = document.getElementById(fromId);
+                const to = document.getElementById(toId);
+                
+                from.classList.remove('active');
+                from.classList.add(direction === 'left' ? 'hidden-left' : 'hidden-right');
+                
+                to.classList.remove('hidden-left', 'hidden-right');
+                to.classList.add('active');
+            };
 
-            if (socialsOpen) {
-                win.classList.add('open');
-                if (!projectsOpen) main.classList.add('shift-right');
-            } else {
-                win.classList.remove('open');
-                if (!projectsOpen) main.classList.remove('shift-right');
+            window.copyDiscord = () => {
+                navigator.clipboard.writeText("deviwoo").then(() => {
+                    const toast = document.getElementById("toast");
+                    toast.classList.add("show");
+                    setTimeout(() => toast.classList.remove("show"), 2500);
+                });
+            };
+
+            if (window.matchMedia("(pointer: fine)").matches) {
+                document.addEventListener("mousemove", (e) => {
+                    const { clientX: x, clientY: y } = e;
+                    const { innerWidth: w, innerHeight: h } = window;
+                    const rx = ((y / h) - 0.5) * -12;
+                    const ry = ((x / w) - 0.5) * 12;
+                    document.documentElement.style.setProperty('--rx', `${rx}deg`);
+                    document.documentElement.style.setProperty('--ry', `${ry}deg`);
+                    document.documentElement.style.setProperty('--bg-x', `${(x / w) * 100}%`);
+                    document.documentElement.style.setProperty('--bg-y', `${(y / h) * 100}%`);
+                });
+
+                document.addEventListener("mouseleave", () => {
+                    document.documentElement.style.setProperty('--rx', `0deg`);
+                    document.documentElement.style.setProperty('--ry', `0deg`);
+                    document.documentElement.style.setProperty('--bg-x', `50%`);
+                    document.documentElement.style.setProperty('--bg-y', `50%`);
+                });
             }
-        }
-
-        // Konami code easter egg
-        const code = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
-        let idx = 0;
-        document.addEventListener('keydown', e => {
-            idx = e.key === code[idx] ? idx + 1 : 0;
-            if (idx === code.length) { idx = 0; alert('🌿 easter egg! 🌿'); }
         });
     </script>
 </body>
