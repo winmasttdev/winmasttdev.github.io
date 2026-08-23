@@ -1327,6 +1327,96 @@
             margin-left: 6px;
         }
 
+        /* ===== COMPREHENSIVE MOBILE PHONE OPTIMIZATIONS ===== */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button, .rig-chassis, .collectible-card, .store-tab-btn, .sidebar-item, .dock-item {
+            touch-action: manipulation;
+        }
+
+        @media (max-width: 640px) {
+            .workspace {
+                padding: 4px 6px;
+            }
+            .macos-window {
+                border-radius: 12px;
+                height: calc(100vh - 65px);
+            }
+            .window-titlebar {
+                height: 38px;
+                padding: 0 10px;
+            }
+            .window-sidebar {
+                width: 52px;
+                padding: 8px 4px;
+            }
+            .sidebar-avatar {
+                width: 38px;
+                height: 38px;
+            }
+            .sidebar-item {
+                padding: 8px 4px;
+                font-size: 1.1rem;
+            }
+            .window-content {
+                padding: 10px 8px;
+            }
+            .tycoon-header-bar {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+                padding: 8px 10px;
+            }
+            .stat-card .stat-val {
+                font-size: 0.88rem;
+            }
+            .tycoon-main-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .rig-clicker-box {
+                padding: 10px 8px;
+            }
+            .rig-chassis {
+                width: 110px;
+                height: 140px;
+                margin: 6px 0;
+            }
+            .fan-spinner {
+                width: 40px;
+                height: 40px;
+                font-size: 0.95rem;
+            }
+            .cards-album-grid {
+                grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+                gap: 6px;
+                max-height: 360px;
+            }
+            .collectible-card {
+                padding: 6px 4px;
+            }
+            .card-title {
+                font-size: 0.65rem;
+                min-height: 24px;
+            }
+            .card-art-icon {
+                font-size: 1.3rem;
+                margin: 3px 0;
+            }
+            .macos-dock {
+                height: 48px;
+                padding: 0 10px;
+                gap: 6px;
+                bottom: 6px;
+            }
+            .dock-item {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+        }
+
         /* ===== COMPLETE POLISHED PC TYCOON FARM STYLES ===== */
         .tycoon-container {
             display: flex;
