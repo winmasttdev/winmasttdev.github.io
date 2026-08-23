@@ -4177,7 +4177,7 @@
             tycoon.btcPrice = Math.max(35000, tycoon.btcPrice + (Math.random() - 0.49) * 850);
         }, 3000);
 
-        /* Load Tycoon Save */
+        /* ===== COMPREHENSIVE TYCOON PERSISTENCE & LOAD ===== */
         try {
             var rawSave = localStorage.getItem('deviwoo_tycoon_save_v2');
             if (rawSave) {
@@ -4185,8 +4185,49 @@
                 if (parsed && typeof parsed.money === 'number') {
                     tycoon.money = parsed.money;
                     tycoon.totalEarned = parsed.totalEarned || parsed.money;
+                    tycoon.clicks = parsed.clicks || 0;
                     tycoon.cores = parsed.cores || 0;
+                    tycoon.gems = (typeof parsed.gems === 'number') ? parsed.gems : 25;
+                    tycoon.usdt = (typeof parsed.usdt === 'number') ? parsed.usdt : 100.0;
+                    tycoon.tor = (typeof parsed.tor === 'number') ? parsed.tor : 15.0;
+                    tycoon.btc = (typeof parsed.btc === 'number') ? parsed.btc : 0.0;
                     tycoon.inventory = parsed.inventory || tycoon.inventory;
+                    tycoon.ownedCards = parsed.ownedCards || tycoon.ownedCards;
+                    tycoon.ownedGadgets = parsed.ownedGadgets || tycoon.ownedGadgets;
+                    tycoon.lastDailyClaim = parsed.lastDailyClaim || 0;
+
+                    // Restore achievements claimed state
+                    if (Array.isArray(parsed.achievements)) {
+                        parsed.achievements.forEach(function(savedA) {
+                            var liveA = tycoon.achievements.find(function(a) { return a.id === savedA.id; });
+                            if (liveA && savedA.claimed) liveA.claimed = true;
+                        });
+                    }
+
+                    // Restore daily quests state
+                    if (Array.isArray(parsed.dailyQuests)) {
+                        parsed.dailyQuests.forEach(function(savedQ) {
+                            var liveQ = tycoon.dailyQuests.find(function(q) { return q.id === savedQ.id; });
+                            if (liveQ) {
+                                liveQ.current = savedQ.current || 0;
+                                liveQ.claimed = savedQ.claimed || false;
+                            }
+                        });
+                    }
+
+                    // Restore darknet targets & store
+                    if (Array.isArray(parsed.darknetTargets)) {
+                        parsed.darknetTargets.forEach(function(savedT) {
+                            var liveT = tycoon.darknetTargets.find(function(t) { return t.id === savedT.id; });
+                            if (liveT && savedT.cracked) liveT.cracked = true;
+                        });
+                    }
+                    if (Array.isArray(parsed.darknetStore)) {
+                        parsed.darknetStore.forEach(function(savedS) {
+                            var liveS = tycoon.darknetStore.find(function(s) { return s.id === savedS.id; });
+                            if (liveS && savedS.bought) liveS.bought = true;
+                        });
+                    }
                     
                     var now = Date.now();
                     var lastTime = parsed.lastSaveTime || now;
@@ -4213,7 +4254,7 @@
                 localStorage.setItem('deviwoo_tycoon_save_v2', JSON.stringify(tycoon));
             } catch(e) {}
         }
-        setInterval(saveTycoon, 3000);
+        setInterval(saveTycoon, 2500);
 
         function getOwnedCount(cat, idx) {
             if (!tycoon.inventory[cat]) return 0;
