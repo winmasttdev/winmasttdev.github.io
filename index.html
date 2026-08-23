@@ -3801,11 +3801,59 @@
             saveTycoon();
         }
 
-        /* ===== REAL VERIFIED GLOBAL LEADERBOARD & CLOUD SYNC ===== */
+        /* ===== HARDWARE (HWID), DEVICE & IP FINGERPRINTING ENGINE ===== */
+        function generateClientFingerprint() {
+            var nav = window.navigator || {};
+            var scr = window.screen || {};
+            
+            var cores = nav.hardwareConcurrency || 4;
+            var memory = nav.deviceMemory || 8;
+            var screenRes = (scr.width || 1920) + 'x' + (scr.height || 1080) + 'x' + (scr.colorDepth || 24);
+            var platform = nav.userAgentData ? (nav.userAgentData.platform || 'Unknown') : (nav.platform || 'Linux');
+            var ua = nav.userAgent || '';
+            var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
+            var deviceType = isMobile ? 'Mobile' : (/Mac/i.test(platform) ? 'macOS' : (/Win/i.test(platform) ? 'Windows' : 'Linux'));
+
+            var glRenderer = 'GPU Node';
+            try {
+                var canvas = document.createElement('canvas');
+                var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                if (gl) {
+                    var debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                    if (debugInfo) {
+                        glRenderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || 'WebGL GPU';
+                    }
+                }
+            } catch(e) {}
+
+            var rawStr = cores + '_' + memory + '_' + screenRes + '_' + platform + '_' + glRenderer;
+            var hash = 0;
+            for (var i = 0; i < rawStr.length; i++) {
+                var char = rawStr.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash |= 0;
+            }
+            var hexHash = Math.abs(hash).toString(16).toUpperCase().padStart(8, '0');
+            var hwid = 'HWID-' + hexHash.slice(0, 4) + '-' + hexHash.slice(4, 8);
+            
+            return {
+                hwid: hwid,
+                device: deviceType,
+                specs: deviceType + ' • ' + cores + ' Cores • ' + memory + 'GB',
+                gpu: glRenderer.replace(/ANGLE \(|Direct3D.*|vs_\d+_\d+.*|\)/g, '').trim()
+            };
+        }
+
+        var clientHardware = generateClientFingerprint();
+
         tycoon.userAccount = {
-            username: 'deviwoo',
+            username: 'Miner_' + clientHardware.hwid.slice(-4),
+            hwid: clientHardware.hwid,
+            device: clientHardware.device,
+            specs: clientHardware.specs,
+            ip: 'Detecting...',
             avatar: 'avatar.png',
-            tag: '#0401',
+            tag: '#' + clientHardware.hwid.slice(-4),
             lastSynced: 0
         };
 
@@ -3813,8 +3861,25 @@
             var savedAcc = localStorage.getItem('deviwoo_user_account');
             if (savedAcc) {
                 var p = JSON.parse(savedAcc);
-                if (p && p.username) tycoon.userAccount = p;
+                if (p && p.username) {
+                    tycoon.userAccount.username = p.username;
+                    if (p.avatar) tycoon.userAccount.avatar = p.avatar;
+                }
             }
+        } catch(e) {}
+
+        // Asynchronously detect Public IP
+        try {
+            fetch('https://api.ipify.org?format=json')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data && data.ip) {
+                        tycoon.userAccount.ip = data.ip;
+                        var ipEl = document.getElementById('accIpLabel');
+                        if (ipEl) ipEl.innerText = 'IP: ' + data.ip;
+                    }
+                })
+                .catch(function() {});
         } catch(e) {}
 
         function calcLeaderboardScore() {
@@ -3828,21 +3893,22 @@
         function getRealLeaderboardEntries() {
             var entries = [];
             try {
-                var raw = localStorage.getItem('deviwoo_real_leaderboard_v1');
+                var raw = localStorage.getItem('deviwoo_real_leaderboard_v2');
                 if (raw) entries = JSON.parse(raw) || [];
             } catch(e) {}
 
-            // Ensure current active user entry is included and updated
             var myScore = calcLeaderboardScore();
-            var myIndex = entries.findIndex(function(e) { return e.username === tycoon.userAccount.username; });
+            var myKey = tycoon.userAccount.hwid;
+            var myIndex = entries.findIndex(function(e) { return e.hwid === myKey || e.username === tycoon.userAccount.username; });
             var myData = {
                 username: tycoon.userAccount.username,
+                hwid: tycoon.userAccount.hwid,
+                device: tycoon.userAccount.specs,
+                ip: tycoon.userAccount.ip,
                 score: myScore,
                 cores: tycoon.cores || 0,
                 cards: Object.keys(tycoon.ownedCards || {}).length,
-                rig: 'NyanBox Main Rig',
-                timestamp: Date.now(),
-                isMe: true
+                timestamp: Date.now()
             };
 
             if (myIndex >= 0) {
@@ -3851,7 +3917,6 @@
                 entries.push(myData);
             }
 
-            // Sort purely by real verified score
             entries.sort(function(a, b) { return b.score - a.score; });
             entries.forEach(function(e, i) { e.rank = i + 1; });
             return entries;
@@ -3867,10 +3932,10 @@
             try {
                 localStorage.setItem('deviwoo_user_account', JSON.stringify(tycoon.userAccount));
                 var realEntries = getRealLeaderboardEntries();
-                localStorage.setItem('deviwoo_real_leaderboard_v1', JSON.stringify(realEntries));
+                localStorage.setItem('deviwoo_real_leaderboard_v2', JSON.stringify(realEntries));
             } catch(e) {}
 
-            toast('☁️ Real Account Data Synced! Score: ' + formatNum(calcLeaderboardScore()) + ' pts ✓');
+            toast('☁️ HWID [' + tycoon.userAccount.hwid + '] Synced! Score: ' + formatNum(calcLeaderboardScore()) + ' pts ✓');
             saveTycoon();
             renderStore();
         }
@@ -4790,15 +4855,18 @@
                 var myScore = calcLeaderboardScore();
 
                 var rowsHtml = realPlayers.map(function(p) {
-                    var isMyAccount = p.username === tycoon.userAccount.username;
+                    var isMyAccount = (p.hwid === tycoon.userAccount.hwid);
                     return `
                         <tr class="${isMyAccount ? 'my-rank' : ''}">
                             <td style="font-weight: 800; color: ${p.rank === 1 ? '#FFD60A' : (p.rank <= 3 ? 'var(--miku)' : '#fff')}">#${p.rank}</td>
-                            <td>${p.username} ${isMyAccount ? '<span style="color: var(--miku); font-size: 0.65rem;">(YOU)</span>' : ''}</td>
+                            <td>
+                                <div>${p.username} ${isMyAccount ? '<span style="color: var(--miku); font-size: 0.65rem;">(THIS DEVICE)</span>' : ''}</div>
+                                <div style="font-size: 0.62rem; color: var(--text-dim); font-family: 'JetBrains Mono';">${p.hwid || 'HWID-NODE'} • ${p.ip || 'Local'}</div>
+                            </td>
                             <td style="color: var(--gold); font-weight: 700;">${formatNum(p.score)}</td>
                             <td>${p.cores} 💎</td>
                             <td>${p.cards}/100</td>
-                            <td style="color: var(--text-dim); font-size: 0.68rem;">${p.rig}</td>
+                            <td style="color: var(--text-dim); font-size: 0.68rem;">${p.device || 'Workstation'}</td>
                         </tr>
                     `;
                 }).join('');
@@ -4808,30 +4876,32 @@
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <img src="${tycoon.userAccount.avatar}" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--miku);">
                             <div>
-                                <div style="font-size: 0.95rem; font-weight: 800; color: #fff;">
-                                    <input type="text" id="accUsername" value="${tycoon.userAccount.username}" style="background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: #fff; padding: 2px 8px; border-radius: 6px; font-family: 'JetBrains Mono'; font-size: 0.8rem; font-weight: 800; width: 130px;">
-                                    <span style="font-size: 0.7rem; color: var(--miku);">${tycoon.userAccount.tag}</span>
+                                <div style="font-size: 0.95rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 6px;">
+                                    <input type="text" id="accUsername" value="${tycoon.userAccount.username}" style="background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: #fff; padding: 2px 8px; border-radius: 6px; font-family: 'JetBrains Mono'; font-size: 0.8rem; font-weight: 800; width: 140px;">
+                                    <span style="font-size: 0.68rem; color: var(--miku); font-family: 'JetBrains Mono';">${tycoon.userAccount.hwid}</span>
                                 </div>
-                                <div style="font-size: 0.7rem; color: var(--text-dim); font-family: 'JetBrains Mono';">Verified Score: <strong style="color: var(--gold);">${formatNum(myScore)}</strong> • Rebirths: ${tycoon.cores} 💎</div>
+                                <div style="font-size: 0.68rem; color: var(--text-dim); font-family: 'JetBrains Mono'; margin-top: 2px;">
+                                    Specs: <strong style="color: #fff;">${tycoon.userAccount.specs}</strong> • <span id="accIpLabel">IP: ${tycoon.userAccount.ip}</span>
+                                </div>
                             </div>
                         </div>
                         <button class="upg-buy-btn" style="background: #38BDF8; border-color: #38BDF8; color: #000; font-weight: 800;" onclick="syncAccountData()">
-                            <i class="fa-solid fa-cloud-arrow-up"></i> SYNC ACCOUNT
+                            <i class="fa-solid fa-cloud-arrow-up"></i> SYNC HWID SCORE
                         </button>
                     </div>
 
                     <div style="font-size: 0.85rem; font-weight: 800; color: #fff; margin-bottom: 6px; font-family: 'JetBrains Mono';">
-                        🌐 Real Verified Player Standings
+                        🌐 Real Hardware-Fingerprinted Player Standings
                     </div>
                     <table class="leaderboard-table">
                         <thead>
                             <tr>
                                 <th>Rank</th>
-                                <th>Player Handle</th>
+                                <th>Miner / HWID</th>
                                 <th>Score</th>
                                 <th>Cores</th>
                                 <th>Cards</th>
-                                <th>Primary Rig</th>
+                                <th>Device Specs</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -4839,7 +4909,7 @@
                         </tbody>
                     </table>
                     <div style="font-size: 0.68rem; color: var(--text-dim); font-family: 'JetBrains Mono'; text-align: center; margin-top: 10px;">
-                        ✓ Only real verified synced player accounts are recorded. No simulated entries.
+                        🔒 Tracked by unique Client Hardware ID (HWID), GPU Renderer, Platform & IP.
                     </div>
                 `;
                 return;
