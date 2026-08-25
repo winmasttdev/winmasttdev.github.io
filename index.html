@@ -1417,6 +1417,104 @@
             }
         }
 
+        /* ===== ADMIN / DEVELOPER CHEAT CONSOLE ===== */
+        function adminAddCash(amt) {
+            tycoon.money = (tycoon.money || 0) + amt;
+            tycoon.totalEarned = (tycoon.totalEarned || 0) + amt;
+            toast('Admin: Added $' + formatNum(amt) + ' Cash! 💵');
+            updateTycoonUI();
+            saveTycoon();
+        }
+
+        function adminAddGems(amt) {
+            tycoon.gems = (tycoon.gems || 0) + amt;
+            toast('Admin: Added ' + amt + ' Gems! 💎');
+            updateTycoonUI();
+            saveTycoon();
+        }
+
+        function adminAddCrypto(type, amt) {
+            if (type === 'btc') tycoon.btc = (tycoon.btc || 0) + amt;
+            if (type === 'usdt') tycoon.usdt = (tycoon.usdt || 0) + amt;
+            if (type === 'tor') tycoon.tor = (tycoon.tor || 0) + amt;
+            toast('Admin: Added ' + amt + ' ' + type.toUpperCase() + '!');
+            updateTycoonUI();
+            saveTycoon();
+        }
+
+        function adminAddCores(amt) {
+            tycoon.cores = (tycoon.cores || 0) + amt;
+            toast('Admin: Added ' + amt + ' Nano-Cores! 💎');
+            updateTycoonUI();
+            saveTycoon();
+        }
+
+        function adminUnlockAllCards() {
+            cardsDB.forEach(function(c) {
+                tycoon.ownedCards[c.id] = (tycoon.ownedCards[c.id] || 0) + 1;
+            });
+            toast('Admin: Unlocked all 100 Collectible Cards! 🃏');
+            updateTycoonUI();
+            renderStore();
+            saveTycoon();
+        }
+
+        function adminUnlockAchievements() {
+            tycoon.achievements.forEach(function(a) {
+                a.claimed = true;
+            });
+            toast('Admin: Unlocked and claimed all achievements! 🏆');
+            updateTycoonUI();
+            renderStore();
+            saveTycoon();
+        }
+
+        function adminMaxParts() {
+            ['cpu', 'gpu', 'ram', 'cooling', 'facility', 'bots'].forEach(function(cat) {
+                tycoonDB[cat].forEach(function(item, idx) {
+                    tycoon.inventory[cat][idx] = (tycoon.inventory[cat][idx] || 0) + 25;
+                });
+            });
+            toast('Admin: Added +25 to all PC components & facilities! ⚡');
+            updateTycoonUI();
+            renderStore();
+            saveTycoon();
+        }
+
+        function adminTriggerTurbo() {
+            tycoon.turboUntil = Date.now() + 60000;
+            toast('Admin: Turbo Boost activated for 60s! 🔥');
+            updateTycoonUI();
+        }
+
+        function factoryResetProgress() {
+            if (!confirm('Are you sure you want to reset ALL progress to factory fresh?')) return;
+            localStorage.removeItem('deviwoo_tycoon_save_v2');
+            localStorage.removeItem('deviwoo_real_leaderboard_v2');
+            tycoon.money = 150.0;
+            tycoon.totalEarned = 150.0;
+            tycoon.clicks = 0;
+            tycoon.cores = 0;
+            tycoon.gems = 25;
+            tycoon.usdt = 100.0;
+            tycoon.tor = 15.0;
+            tycoon.btc = 0.0;
+            tycoon.inventory = { cpu: {}, gpu: {}, ram: {}, cooling: {}, facility: {}, bots: {} };
+            tycoon.ownedCards = {};
+            tycoon.ownedGadgets = {};
+            tycoon.lastDailyClaim = 0;
+            tycoon.turboUntil = 0;
+            tycoon.turboCooldownUntil = 0;
+            
+            tycoon.achievements.forEach(function(a) { a.claimed = false; });
+            tycoon.dailyQuests.forEach(function(q) { q.current = 0; q.claimed = false; });
+            
+            saveTycoon();
+            updateTycoonUI();
+            renderStore();
+            toast('🗑️ Factory Reset: All progress reset to fresh start! ✓');
+        }
+
         /* ===== COMPLETE POLISHED PC TYCOON FARM STYLES ===== */
         .tycoon-container {
             display: flex;
@@ -2169,6 +2267,7 @@
                                         <button class="store-tab-btn" id="tab-gadgets" onclick="switchStoreTab('gadgets')" style="color: #A78BFA; border-color: rgba(167, 139, 250, 0.4);"><i class="fa-solid fa-mobile-screen"></i> Gadgets & Portables</button>
                                         <button class="store-tab-btn" id="tab-achievements" onclick="switchStoreTab('achievements')" style="color: #FBBF24; border-color: rgba(251, 191, 36, 0.4);"><i class="fa-solid fa-trophy"></i> Achievements</button>
                                         <button class="store-tab-btn" id="tab-leaderboard" onclick="switchStoreTab('leaderboard')" style="color: #38BDF8; border-color: rgba(56, 189, 248, 0.4);"><i class="fa-solid fa-ranking-star"></i> Leaderboard & Sync</button>
+                                        <button class="store-tab-btn" id="tab-admin" onclick="switchStoreTab('admin')" style="color: #EC4899; border-color: rgba(236, 72, 153, 0.5);"><i class="fa-solid fa-wand-magic-sparkles"></i> Admin Panel</button>
 
                                     </div>
 
@@ -4583,7 +4682,10 @@
         }
 
         function formatNum(n) {
-            if (n === null || n === undefined || isNaN(n) || !isFinite(n)) return '0.00';
+            if (n === null || n === undefined || isNaN(n)) return '0.00';
+            if (n === 0) return '0.00';
+            if (!isFinite(n)) return '9.99e99';
+            if (Math.abs(n) >= 1e18) return n.toExponential(2);
             if (n >= 1e15) return (n / 1e15).toFixed(2) + 'Q';
             if (n >= 1e12) return (n / 1e12).toFixed(2) + 'T';
             if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
@@ -4593,7 +4695,10 @@
         }
 
         function formatHash(h) {
-            if (h === null || h === undefined || isNaN(h) || !isFinite(h) || h <= 0) return '0.00 MH/s';
+            if (h === null || h === undefined || isNaN(h) || h <= 0) return '0.00 MH/s';
+            if (!isFinite(h)) return '9.99e99 MH/s';
+            if (h >= 1e12) return (h * 1000000).toExponential(2) + ' MH/s';
+            if (h >= 1e9) return (h / 1e9).toFixed(2) + ' ZH/s';
             if (h >= 1e6) return (h / 1e6).toFixed(2) + ' EH/s';
             if (h >= 1e3) return (h / 1e3).toFixed(2) + ' PH/s';
             if (h >= 1) return h.toFixed(2) + ' TH/s';
@@ -4702,7 +4807,7 @@
                 return;
             }
 
-            if (['dex', 'cards', 'quests', 'market', 'gadgets', 'achievements', 'leaderboard', 'terminal'].indexOf(cat) !== -1) {
+            if (['dex', 'cards', 'quests', 'market', 'gadgets', 'achievements', 'leaderboard', 'terminal', 'admin'].indexOf(cat) !== -1) {
                 return; // Non-standard hardware stores don't use upg-btn-X
             }
 
@@ -4993,6 +5098,74 @@
                         Complete milestones to earn Gems, unlock Rebirth tiers, and prove your compute supremacy!
                     </p>
                     ${achHtml}
+                `;
+                return;
+            }
+
+            if (cat === 'admin') {
+                container.innerHTML = `
+                    <div style="background: rgba(236, 72, 153, 0.08); border: 1px solid rgba(236, 72, 153, 0.3); border-radius: 14px; padding: 14px; margin-bottom: 12px;">
+                        <div style="font-size: 0.95rem; font-weight: 800; color: #EC4899; display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Developer & Admin Control Console
+                        </div>
+                        <div style="font-size: 0.72rem; color: var(--text-dim); font-family: 'JetBrains Mono'; margin-bottom: 12px;">
+                            Test massive scientific notation (1e18, 1e24), add unlimited resources, unlock cards, or factory reset save state.
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-bottom: 14px;">
+                            <button class="upg-buy-btn" style="background: #10B981; border-color: #10B981; color: #000; font-weight: 800;" onclick="adminAddCash(1000000)">
+                                💵 +$1,000,000
+                            </button>
+                            <button class="upg-buy-btn" style="background: #10B981; border-color: #10B981; color: #000; font-weight: 800;" onclick="adminAddCash(1e12)">
+                                💵 +$1.00e12 (1T)
+                            </button>
+                            <button class="upg-buy-btn" style="background: #10B981; border-color: #10B981; color: #000; font-weight: 800;" onclick="adminAddCash(1e18)">
+                                💵 +$1.00e18 (1Q)
+                            </button>
+                            <button class="upg-buy-btn" style="background: #38BDF8; border-color: #38BDF8; color: #000; font-weight: 800;" onclick="adminAddGems(5000)">
+                                💎 +5,000 Gems
+                            </button>
+                            <button class="upg-buy-btn" style="background: #F59E0B; border-color: #F59E0B; color: #000; font-weight: 800;" onclick="adminAddCrypto('btc', 5.0)">
+                                ₿ +5.0 BTC
+                            </button>
+                            <button class="upg-buy-btn" style="background: #34D399; border-color: #34D399; color: #000; font-weight: 800;" onclick="adminAddCrypto('usdt', 50000)">
+                                ₮ +50,000 USDT
+                            </button>
+                            <button class="upg-buy-btn" style="background: #A78BFA; border-color: #A78BFA; color: #000; font-weight: 800;" onclick="adminAddCrypto('tor', 500)">
+                                🧅 +500 TOR
+                            </button>
+                            <button class="upg-buy-btn" style="background: #EC4899; border-color: #EC4899; color: #000; font-weight: 800;" onclick="adminAddCores(50)">
+                                💎 +50 Nano-Cores
+                            </button>
+                        </div>
+
+                        <div style="font-size: 0.82rem; font-weight: 800; color: #fff; margin-bottom: 6px; font-family: 'JetBrains Mono';">
+                            ⚡ Quick Unlock Cheats:
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-bottom: 14px;">
+                            <button class="upg-buy-btn" style="background: rgba(255,214,10,0.2); border-color: var(--gold); color: #FFD60A;" onclick="adminUnlockAllCards()">
+                                🃏 Unlock 100 Cards
+                            </button>
+                            <button class="upg-buy-btn" style="background: rgba(251,191,36,0.2); border-color: #FBBF24; color: #FBBF24;" onclick="adminUnlockAchievements()">
+                                🏆 Unlock Achievements
+                            </button>
+                            <button class="upg-buy-btn" style="background: rgba(0,240,255,0.2); border-color: var(--miku); color: var(--miku);" onclick="adminMaxParts()">
+                                ⚡ Max All Hardware (+25x)
+                            </button>
+                            <button class="upg-buy-btn" style="background: rgba(255,45,117,0.2); border-color: var(--teto); color: var(--teto);" onclick="adminTriggerTurbo()">
+                                🔥 Instant Turbo (60s)
+                            </button>
+                        </div>
+
+                        <div style="border-top: 1px solid var(--border); padding-top: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                            <button class="upg-buy-btn" style="background: #EF4444; border-color: #EF4444; color: #fff; font-weight: 800;" onclick="factoryResetProgress()">
+                                🗑️ FACTORY RESET ALL PROGRESS
+                            </button>
+                            <button class="upg-buy-btn" style="background: rgba(255,255,255,0.08); border-color: var(--border); color: var(--text-dim);" onclick="repairTycoonSave()">
+                                🛠️ Auto-Sanitize Corrupt State
+                            </button>
+                        </div>
+                    </div>
                 `;
                 return;
             }
