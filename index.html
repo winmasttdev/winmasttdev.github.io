@@ -4732,6 +4732,31 @@
             };
         }
 
+        function clickRig(e) {
+            sanitizeTycoonState();
+            var val = calcClickValue();
+            tycoon.money += val;
+            tycoon.totalEarned += val;
+            tycoon.clicks = (tycoon.clicks || 0) + 1;
+
+            var clickQ = tycoon.dailyQuests.find(function(q) { return q.id === 'q_click'; });
+            if (clickQ && !clickQ.claimed) clickQ.current++;
+
+            if (e && e.clientX) {
+                var spark = document.createElement('div');
+                spark.className = 'click-spark';
+                spark.innerText = '+$' + formatNum(val);
+                spark.style.left = e.clientX + 'px';
+                spark.style.top = e.clientY + 'px';
+                document.body.appendChild(spark);
+                setTimeout(function() {
+                    if (spark.parentNode) spark.parentNode.removeChild(spark);
+                }, 750);
+            }
+
+            updateTycoonUI();
+        }
+
         function activateTurbo() {
             var now = Date.now();
             if (now < tycoon.turboCooldownUntil) return;
