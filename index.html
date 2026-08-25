@@ -3696,11 +3696,12 @@
         };
 
         function executeDexSwap() {
+            sanitizeTycoonState();
             var from = document.getElementById('swapFrom').value;
             var to = document.getElementById('swapTo').value;
             var amt = parseFloat(document.getElementById('swapAmount').value);
 
-            if (isNaN(amt) || amt <= 0) {
+            if (isNaN(amt) || !isFinite(amt) || amt <= 0) {
                 toast('Enter a valid swap amount!');
                 return;
             }
@@ -3722,30 +3723,42 @@
                 return;
             }
 
+            var btcPrice = (tycoon.btcPrice && isFinite(tycoon.btcPrice) && tycoon.btcPrice > 1000) ? tycoon.btcPrice : 86500.0;
+
+            // Calculate target amount via USD bridge
+            var usdVal = amt;
+            if (from === 'usdt') usdVal = amt * 1.0;
+            if (from === 'tor') usdVal = amt * (dexRates.tor_usd || 8.33);
+            if (from === 'gems') usdVal = amt * (dexRates.gems_usd || 100.0);
+            if (from === 'btc') usdVal = amt * btcPrice;
+
+            var targetVal = usdVal;
+            if (to === 'usd') targetVal = usdVal;
+            if (to === 'usdt') targetVal = usdVal * 1.0;
+            if (to === 'tor') targetVal = usdVal * (dexRates.usd_tor || 0.12);
+            if (to === 'gems') targetVal = usdVal * (dexRates.usd_gems || 0.01);
+            if (to === 'btc') targetVal = usdVal / btcPrice;
+
+            if (isNaN(targetVal) || !isFinite(targetVal) || targetVal <= 0) {
+                toast('Error calculating swap exchange rate.');
+                return;
+            }
+
+            // Deduct
             if (from === 'usd') tycoon.money -= amt;
             if (from === 'usdt') tycoon.usdt -= amt;
             if (from === 'tor') tycoon.tor -= amt;
             if (from === 'gems') tycoon.gems -= amt;
             if (from === 'btc') tycoon.btc -= amt;
 
-            var usdVal = amt;
-            if (from === 'usdt') usdVal = amt * 1.0;
-            if (from === 'tor') usdVal = amt * dexRates.tor_usd;
-            if (from === 'gems') usdVal = amt * dexRates.gems_usd;
-            if (from === 'btc') usdVal = amt * tycoon.btcPrice;
-
-            var targetVal = usdVal;
-            if (to === 'usd') targetVal = usdVal;
-            if (to === 'usdt') targetVal = usdVal * 1.0;
-            if (to === 'tor') targetVal = usdVal * dexRates.usd_tor;
-            if (to === 'gems') targetVal = usdVal * dexRates.usd_gems;
-            if (to === 'btc') targetVal = usdVal / tycoon.btcPrice;
-
+            // Credit target
             if (to === 'usd') tycoon.money += targetVal;
             if (to === 'usdt') tycoon.usdt += targetVal;
             if (to === 'tor') tycoon.tor += targetVal;
             if (to === 'gems') tycoon.gems += targetVal;
             if (to === 'btc') tycoon.btc += targetVal;
+
+            sanitizeTycoonState();
 
             var swapQ = tycoon.dailyQuests.find(function(q) { return q.id === 'q_swap'; });
             if (swapQ && !swapQ.claimed) swapQ.current++;
@@ -4479,56 +4492,98 @@
             renderStore();
         }
 
+        function sanitizeTycoonState() {
+            if (typeof tycoon !== 'object' || !tycoon) return;
+            if (isNaN(tycoon.money) || !isFinite(tycoon.money) || tycoon.money < 0) tycoon.money = 150.0;
+            if (isNaN(tycoon.totalEarned) || !isFinite(tycoon.totalEarned) || tycoon.totalEarned < 0) tycoon.totalEarned = 150.0;
+            if (isNaN(tycoon.gems) || !isFinite(tycoon.gems) || tycoon.gems < 0) tycoon.gems = 25;
+            if (isNaN(tycoon.usdt) || !isFinite(tycoon.usdt) || tycoon.usdt < 0) tycoon.usdt = 100.0;
+            if (isNaN(tycoon.tor) || !isFinite(tycoon.tor) || tycoon.tor < 0) tycoon.tor = 15.0;
+            if (isNaN(tycoon.btc) || !isFinite(tycoon.btc) || tycoon.btc < 0) tycoon.btc = 0.0;
+            if (isNaN(tycoon.cores) || !isFinite(tycoon.cores) || tycoon.cores < 0) tycoon.cores = 0;
+            if (isNaN(tycoon.clicks) || !isFinite(tycoon.clicks) || tycoon.clicks < 0) tycoon.clicks = 0;
+            if (!tycoon.btcPrice || isNaN(tycoon.btcPrice) || !isFinite(tycoon.btcPrice) || tycoon.btcPrice < 1000) tycoon.btcPrice = 86500.0;
+
+            var now = Date.now();
+            if (tycoon.turboUntil > now + 60000) tycoon.turboUntil = now + 15000;
+            if (tycoon.turboCooldownUntil > now + 120000) tycoon.turboCooldownUntil = now + 45000;
+        }
+
+        function repairTycoonSave() {
+            sanitizeTycoonState();
+            // Clean up any corrupt inventory counts
+            ['cpu', 'gpu', 'ram', 'cooling', 'facility', 'bots'].forEach(function(cat) {
+                if (typeof tycoon.inventory[cat] !== 'object' || !tycoon.inventory[cat]) tycoon.inventory[cat] = {};
+                Object.keys(tycoon.inventory[cat]).forEach(function(k) {
+                    var val = tycoon.inventory[cat][k];
+                    if (isNaN(val) || !isFinite(val) || val < 0) tycoon.inventory[cat][k] = 0;
+                });
+            });
+            saveTycoon();
+            updateTycoonUI();
+            renderStore();
+            toast('🛠️ Farm state repaired & sanitized successfully! ✓');
+        }
+
         function calcHashrate() {
+            sanitizeTycoonState();
             var total = 0;
             ['cpu', 'gpu', 'ram'].forEach(function(cat) {
                 var items = tycoonDB[cat] || [];
                 var catCounts = tycoon.inventory[cat] || {};
                 items.forEach(function(item, idx) {
                     var cnt = catCounts[idx] || 0;
-                    if (cnt > 0) {
+                    if (cnt > 0 && isFinite(cnt) && isFinite(item.hash)) {
                         total += item.hash * cnt;
                     }
                 });
             });
 
-            // Facility multiplier compounding
+            // Facility multiplier: additive scaling to prevent Infinity overflow!
             var facMult = 1.0;
             var facCounts = tycoon.inventory.facility || {};
             tycoonDB.facility.forEach(function(f, idx) {
                 var cnt = facCounts[idx] || 0;
-                if (cnt > 0) {
-                    facMult *= Math.pow(f.mult, cnt);
+                if (cnt > 0 && isFinite(cnt) && isFinite(f.mult)) {
+                    facMult += (f.mult - 1.0) * cnt;
                 }
             });
 
-            var coreMult = 1.0 + (tycoon.cores * 1.0);
-            var turboMult = (Date.now() < tycoon.turboUntil) ? 5.0 : 1.0;
+            var coreMult = 1.0 + ((tycoon.cores || 0) * 1.0);
+            var now = Date.now();
+            var turboMult = (now < tycoon.turboUntil) ? 5.0 : 1.0;
 
             var cardMults = calcCardMultipliers();
-            return total * facMult * coreMult * turboMult * cardMults.hashMult;
+            var finalHash = total * facMult * coreMult * turboMult * (cardMults.hashMult || 1.0);
+            return (isFinite(finalHash) && !isNaN(finalHash) && finalHash >= 0) ? finalHash : 0;
         }
 
         function calcIncomeRate() {
             var hash = calcHashrate();
-            return hash * 0.35;
+            var rate = hash * 0.35;
+            return (isFinite(rate) && !isNaN(rate) && rate >= 0) ? rate : 0;
         }
 
         function calcClickValue() {
+            sanitizeTycoonState();
             var base = 1.0;
             var cpuCounts = tycoon.inventory.cpu || {};
             tycoonDB.cpu.forEach(function(item, idx) {
                 var cnt = cpuCounts[idx] || 0;
-                if (cnt > 0) base += (item.hash * 0.08 * cnt);
+                if (cnt > 0 && isFinite(cnt) && isFinite(item.hash)) {
+                    base += (item.hash * 0.08 * cnt);
+                }
             });
-            var coreMult = 1.0 + (tycoon.cores * 1.0);
-            var turboMult = (Date.now() < tycoon.turboUntil) ? 5.0 : 1.0;
+            var coreMult = 1.0 + ((tycoon.cores || 0) * 1.0);
+            var now = Date.now();
+            var turboMult = (now < tycoon.turboUntil) ? 5.0 : 1.0;
             var cardMults = calcCardMultipliers();
-            return base * coreMult * turboMult * cardMults.clickMult;
+            var finalClick = base * coreMult * turboMult * (cardMults.clickMult || 1.0);
+            return (isFinite(finalClick) && !isNaN(finalClick) && finalClick >= 0) ? finalClick : 1.0;
         }
 
         function formatNum(n) {
-            if (isNaN(n) || n === undefined) return '0.00';
+            if (n === null || n === undefined || isNaN(n) || !isFinite(n)) return '0.00';
             if (n >= 1e15) return (n / 1e15).toFixed(2) + 'Q';
             if (n >= 1e12) return (n / 1e12).toFixed(2) + 'T';
             if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
@@ -4538,32 +4593,12 @@
         }
 
         function formatHash(h) {
+            if (h === null || h === undefined || isNaN(h) || !isFinite(h) || h <= 0) return '0.00 MH/s';
             if (h >= 1e6) return (h / 1e6).toFixed(2) + ' EH/s';
             if (h >= 1e3) return (h / 1e3).toFixed(2) + ' PH/s';
             if (h >= 1) return h.toFixed(2) + ' TH/s';
             if (h >= 0.001) return (h * 1000).toFixed(2) + ' GH/s';
             return (h * 1000000).toFixed(2) + ' MH/s';
-        }
-
-        function clickRig(e) {
-            var val = calcClickValue();
-            tycoon.money += val;
-            tycoon.totalEarned += val;
-            tycoon.clicks++;
-
-            if (e && e.clientX) {
-                var spark = document.createElement('div');
-                spark.className = 'click-spark';
-                spark.innerText = '+$' + formatNum(val);
-                spark.style.left = e.clientX + 'px';
-                spark.style.top = e.clientY + 'px';
-                document.body.appendChild(spark);
-                setTimeout(function() {
-                    if (spark.parentNode) spark.parentNode.removeChild(spark);
-                }, 800);
-            }
-
-            updateTycoonUI();
         }
 
         function getTurboStats() {
@@ -4576,13 +4611,14 @@
             var coolCounts = tycoon.inventory.cooling || {};
             tycoonDB.cooling.forEach(function(c, idx) {
                 var cnt = coolCounts[idx] || 0;
-                if (cnt > 0) {
+                if (cnt > 0 && isFinite(cnt)) {
                     if (c.turboBonusSec) extraDuration += c.turboBonusSec * cnt;
                     if (c.cooldownReductionSec) cdReduction += c.cooldownReductionSec * cnt;
                 }
             });
             
-            var finalDuration = baseDuration + extraDuration;
+            // Safe caps: max 60s boost, min 4s cooldown
+            var finalDuration = Math.min(60, baseDuration + extraDuration);
             var finalCooldown = Math.max(4, baseCooldown - cdReduction);
             
             return {
@@ -5072,6 +5108,7 @@
                         <button class="upg-buy-btn" id="prestigeBtn" style="margin: 0 auto; background: var(--teto); border-color: var(--teto); color: #fff; padding: 10px 24px; font-size: 0.9rem;" onclick="doPrestige()" ${tycoon.totalEarned < minCash ? 'disabled' : ''}>
                             <i class="fa-solid fa-recycle"></i> QUANTUM REBIRTH (Need $500k lifetime)
                         </button>
+                        <button class="upg-buy-btn" style="margin: 10px auto 0 auto; background: rgba(255,255,255,0.1); border-color: var(--border); color: var(--text-dim); font-size: 0.72rem;" onclick="repairTycoonSave()"><i class="fa-solid fa-wrench"></i> Auto-Repair Farm Data (Fix NaN / Infinity)</button>
                     </div>
                 `;
                 return;
@@ -5240,6 +5277,7 @@
             if (tEl) tEl.innerText = '$' + ttoP.toFixed(0);
         }, 2500);
 
+        sanitizeTycoonState();
         renderStore();
         updateTycoonUI();
 
