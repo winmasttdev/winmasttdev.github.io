@@ -1,0 +1,336 @@
+/* TOTP Lab — no frameworks, no external fonts, system font stack.
+   Light and dark themes via CSS custom properties. */
+
+:root {
+  color-scheme: light dark;
+
+  --bg: #f3f4f7;
+  --panel: #ffffff;
+  --text: #1c2128;
+  --muted: #5b6472;
+  --accent: #0b57d0;
+  --accent-text: #ffffff;
+  --border: #d8dce3;
+  --code-bg: #15181d;
+  --code-text: #e9ecf1;
+  --bar-track: #e2e6ec;
+  --bar-fill: #0b57d0;
+  --ok: #1a7f37;
+  --fail: #b42318;
+  --focus-ring: #0b57d0;
+  --shadow: 0 1px 2px rgb(16 24 40 / 6%), 0 4px 14px rgb(16 24 40 / 6%);
+
+  --radius: 12px;
+  --space: clamp(1rem, 2.5vw, 1.75rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #101317;
+    --panel: #191d23;
+    --text: #e6e9ee;
+    --muted: #9aa3b0;
+    --accent: #6ea8ff;
+    --accent-text: #0c1015;
+    --border: #2d333d;
+    --code-bg: #0a0c0f;
+    --code-text: #e9ecf1;
+    --bar-track: #2a2f38;
+    --bar-fill: #6ea8ff;
+    --ok: #4ac26b;
+    --fail: #ff7d70;
+    --focus-ring: #6ea8ff;
+    --shadow: 0 1px 2px rgb(0 0 0 / 40%), 0 4px 14px rgb(0 0 0 / 30%);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+/* Constrain line length for readability on wide screens. */
+.site-header,
+main,
+.site-footer {
+  width: min(100% - 2rem, 65ch);
+  margin-inline: auto;
+}
+
+h1 {
+  margin: 0 0 0.25rem;
+  font-size: clamp(1.7rem, 4vw, 2.4rem);
+  line-height: 1.15;
+}
+
+h2 {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  line-height: 1.25;
+}
+
+p {
+  margin: 0 0 0.75rem;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas,
+    "Liberation Mono", monospace;
+  font-size: 0.9em;
+  background: color-mix(in srgb, var(--border) 45%, transparent);
+  border-radius: 4px;
+  padding: 0.05em 0.3em;
+  overflow-wrap: anywhere;
+}
+
+.site-header {
+  padding-top: var(--space);
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 1.02rem;
+}
+
+main {
+  display: grid;
+  gap: var(--space);
+  padding-bottom: var(--space);
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: clamp(1rem, 3vw, 1.6rem);
+}
+
+.field {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.field label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
+
+.field input {
+  width: 100%;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas,
+    "Liberation Mono", monospace;
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.field input.invalid {
+  border-color: var(--fail);
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin: 0.4rem 0 0;
+}
+
+.field-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.field select {
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  font: inherit;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Large monospace code display. */
+.code-display {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas,
+    "Liberation Mono", monospace;
+  font-size: clamp(2.4rem, 9vw + 0.9rem, 4.4rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-align: center;
+  background: var(--code-bg);
+  color: var(--code-text);
+  border-radius: var(--radius);
+  padding: 0.9rem 0.5rem;
+  margin: 0.25rem 0 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.timer {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.9rem;
+}
+
+.countdown {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas,
+    "Liberation Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.95rem;
+  color: var(--muted);
+  min-width: 4ch;
+  text-align: right;
+}
+
+.bar {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bar-track);
+  overflow: hidden;
+}
+
+/* The drain itself is pure CSS; the JS only restarts it at each period
+   boundary and sets --bar-period to match the chosen period. */
+.bar-fill {
+  height: 100%;
+  width: 100%;
+  background: var(--bar-fill);
+}
+
+.bar-fill.draining {
+  animation-name: drain;
+  animation-duration: var(--bar-period, 30s);
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes drain {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin: 0 0 0.9rem;
+}
+
+button {
+  font: inherit;
+  font-weight: 600;
+  color: var(--accent-text);
+  background: var(--accent);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+button:hover {
+  filter: brightness(1.08);
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+button.done {
+  background: var(--ok);
+}
+
+.note,
+.lede {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.steps {
+  padding-left: 1.2rem;
+}
+
+.steps li {
+  margin: 0 0 0.5rem;
+}
+
+/* Vector results table. */
+.vector-results {
+  margin-top: 0.5rem;
+  overflow-x: auto;
+}
+
+.vectors {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.vectors th,
+.vectors td {
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas,
+    "Liberation Mono", monospace;
+  white-space: nowrap;
+}
+
+.vectors th {
+  font-weight: 600;
+}
+
+.vectors td.fail {
+  color: var(--fail);
+  font-weight: 700;
+}
+
+.vectors-summary {
+  font-weight: 700;
+  margin: 0.9rem 0 0;
+}
+
+.site-footer {
+  padding-bottom: calc(var(--space) * 1.5);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* Visible focus styles for keyboard users. */
+:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar-fill.draining {
+    animation-duration: 0.01s;
+  }
+}

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TOTP Lab</title>
+  <meta name="description" content="Client-side TOTP demo computing RFC 6238 one-time passwords in the browser with WebCrypto HMAC-SHA1.">
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="totp.js"></script>
+</head>
+<body>
+  <noscript>
+    <p role="alert">This demo needs JavaScript — the codes are computed in your browser with WebCrypto and cannot work without it.</p>
+  </noscript>
+
+  <header class="site-header">
+    <h1>TOTP Lab</h1>
+    <p class="subtitle">
+      One-time codes are computed entirely in your browser with WebCrypto
+      HMAC-SHA1 and never leave this page.
+    </p>
+  </header>
+
+  <main>
+    <section class="panel" aria-labelledby="live-heading">
+      <h2 id="live-heading">Live code</h2>
+
+      <div class="field">
+        <label for="secret">Shared secret (base32)</label>
+        <input id="secret" name="secret" type="text" value="JBSWY3DPEHPK3PXP"
+               autocomplete="off" autocapitalize="off" spellcheck="false"
+               inputmode="text">
+        <p class="hint">
+          JBSWY3DPEHPK3PXP is just a well-known example secret (the base32 of
+          "hello!deadbeef"), not a real credential. The test-vector panel
+          below uses the RFC's published secret, ASCII 12345678901234567890.
+        </p>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="digits">Digits</label>
+          <select id="digits" name="digits">
+            <option value="6" selected>6</option>
+            <option value="8">8</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="period">Period (seconds)</label>
+          <select id="period" name="period">
+            <option value="30" selected>30</option>
+            <option value="60">60</option>
+          </select>
+        </div>
+      </div>
+
+      <p id="code" class="code-display" aria-live="polite">······</p>
+
+      <div class="timer">
+        <span id="countdown" class="countdown">— s</span>
+        <div id="bar" class="bar" role="timer"
+             aria-label="Time remaining in the current period">
+          <div id="bar-fill" class="bar-fill"></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="copy" type="button">Copy</button>
+      </div>
+
+      <p class="note">
+        A real authenticator app computes your codes with this exact
+        algorithm. Pasting real secrets into random web pages is unsafe —
+        even a page that only looks harmless can copy what you type.
+      </p>
+    </section>
+
+    <section class="panel" aria-labelledby="vectors-heading">
+      <h2 id="vectors-heading">RFC test vectors</h2>
+      <p class="lede">
+        Verifies this exact code against the published test vectors:
+        all 10 HOTP vectors from RFC 4226 Appendix D (counter 0–9, 6 digits)
+        and all 6 SHA-1 TOTP vectors from RFC 6238 Appendix B (8 digits,
+        30-second period).
+      </p>
+      <div class="actions">
+        <button id="run-vectors" type="button">Run vectors</button>
+      </div>
+      <div id="vector-results" class="vector-results" aria-live="polite"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="how-heading">
+      <h2 id="how-heading">How it works</h2>
+      <ol class="steps">
+        <li>Base32-decode the shared secret into raw bytes.</li>
+        <li>Derive the step counter: <code>counter = floor(unixTime / period)</code>.</li>
+        <li>Encode the counter as an 8-byte big-endian integer.</li>
+        <li>Compute <code>HMAC-SHA1(secret, counter)</code> with WebCrypto.</li>
+        <li>
+          Dynamic truncation (RFC 4226 §5.3): take the offset from the last
+          HMAC byte (<code>offset = lastByte &amp; 0x0f</code>), read the
+          31-bit big-endian integer at that offset (high bit masked off),
+          take it modulo <code>10^digits</code>, and zero pad to
+          <code>digits</code>.
+        </li>
+      </ol>
+      <p>
+        SHA-1 is the default hash of RFC 6238, and it is safe here because
+        the hash is used as a keyed HMAC, not in a collision-sensitive way —
+        an attacker would need the secret, which never leaves your browser.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Built by a local 27B model (NInfer + KVMem) on 2026-10-28. No trackers, no external requests.</p>
+  </footer>
+</body>
+</html>
